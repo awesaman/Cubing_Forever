@@ -8,7 +8,7 @@ const normalize = require('normalize-url');
 const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
 
-// @route    POST api/users
+// @route    POST api/user
 // @desc     Register new user
 // @access   Public
 router.post(
@@ -83,10 +83,5 @@ router.post(
     }
   }
 );
-
-// @route    GET api/users
-// @desc     Test Route
-// @access   Public
-router.get('/', (req, res) => res.send('Users Running'));
 
 module.exports = router;
