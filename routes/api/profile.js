@@ -10,6 +10,8 @@ const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
 
+// add a note that they must enter all events that they practice so interface can be customized for them
+
 // @route    GET api/profile/me
 // @desc     Get logged in user's profile
 // @access   Private
@@ -55,9 +57,9 @@ router.post(
     const profileFields = {
       user: req.user.id,
       bio,
+      wcaid,
       location,
       events,
-      wcaid,
     };
 
     const socialfields = { youtube, twitter, instagram, facebook };
@@ -81,5 +83,83 @@ router.post(
     }
   }
 );
+
+// @route    PUT api/profile/solve
+// @desc     Add solve
+// @access   Private
+router.put(
+  '/solve',
+  [
+    auth,
+    [
+      check('event', 'Event is required').not().isEmpty(),
+      check('time', 'Time is required').not().isEmpty(),
+      check('scramble', 'Scramble is required').not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { event, time, scramble } = req.body;
+
+    const newSolve = { time, scramble };
+    console.log('reached');
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      for (e in profile.events) {
+        if (profile.events[e].name === event) {
+          profile.events[e].solves.push(newSolve);
+          break;
+        }
+      }
+      await profile.save();
+      res.json(profile);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  }
+);
+
+// @route    DELETE api/profile/solve/:event/:id
+// @desc     Delete a solve
+// @access   Private
+
+router.delete('/solve/:event/:id', auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+    for (e in profile.events) {
+      if (profile.events[e].name === req.params.event) {
+        profile.events[e].solves = profile.events[e].solves.filter(
+          sol => sol._id.toString() !== req.params.id
+        );
+        break;
+      }
+    }
+    await profile.save();
+    return res.status(200).json(profile);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+// @route    DELETE api/profile
+// @desc     Delete profile and user
+// @access   Private
+router.delete('/', auth, async (req, res) => {
+  try {
+    await Profile.findOneAndRemove({ user: req.user.id });
+    await User.findOneAndRemove({ _id: req.user.id });
+    res.json({ msg: 'User deleted' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
 
 module.exports = router;

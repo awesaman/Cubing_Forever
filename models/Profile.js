@@ -32,6 +32,12 @@ const ProfileSchema = new mongoose.Schema({
       avg12: {
         type: Number,
       },
+      solves: [
+        {
+          time: { type: Number },
+          scramble: { type: String },
+        },
+      ],
     },
   ],
   social: {
