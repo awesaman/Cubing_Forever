@@ -34,16 +34,7 @@ img {
   width: 100%;
 }
 
-/* classes */
-
-.container {
-  max-width: 1100px;
-  margin: auto;
-  overflow: hidden;
-  padding: 0 2em;
-  margin-top: 10%;
-  margin-bottom: 10%;
-}
+/* text */
 
 .XL {
   font-size: 10em;
@@ -68,6 +59,8 @@ img {
 .text-light {
   color: $light-color;
 }
+
+/* buttons */
 
 .btn {
   display: inline-block;
@@ -97,6 +90,26 @@ img {
   }
 }
 
+/* alerts */
+
+.alert {
+  padding: 0.8rem;
+  margin: 1rem 0;
+  opacity: 0.9;
+  background: $primary-color;
+  color: $light-color;
+}
+
+.alert-danger {
+  background: $danger-color;
+}
+
+.alert-success {
+  background: $success-color;
+}
+
+/* font awesome */
+
 i.fa-twitter {
   color: #38a1f3;
 }
@@ -111,6 +124,24 @@ i.fa-youtube {
 }
 i.fa-linkedin {
   color: #0077b5;
+}
+
+i.fa-chalkboard-teacher,
+i.fa-stopwatch,
+i.fa-users {
+  color: $light-color;
+  font-size: 3em;
+}
+
+/* general classes */
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  overflow: hidden;
+  padding: 0 2em;
+  margin-top: 10%;
+  margin-bottom: 10%;
 }
 
 .navbar {
@@ -184,11 +215,4 @@ i.fa-linkedin {
   align-items: center;
   margin-top: 10%;
   color: $light-color;
-}
-
-i.fa-chalkboard-teacher,
-i.fa-stopwatch,
-i.fa-users {
-  color: $light-color;
-  font-size: 3em;
 }

@@ -4,18 +4,22 @@ import Navbar from './components/layout/Navbar';
 import Landing from './components/layout/Landing';
 import Routes from './components/routing/Routes';
 import './styles/App.css';
+import store from './store';
+import { Provider } from 'react-redux';
 
 const App = () => {
   return (
-    <Router>
-      <Fragment>
-        <Navbar />
-        <Switch>
-          <Route exact path='/' component={Landing} />
-          <Route component={Routes} />
-        </Switch>
-      </Fragment>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <Fragment>
+          <Navbar />
+          <Switch>
+            <Route exact path='/' component={Landing} />
+            <Route component={Routes} />
+          </Switch>
+        </Fragment>
+      </Router>
+    </Provider>
   );
 };
 
