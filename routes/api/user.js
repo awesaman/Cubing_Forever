@@ -31,12 +31,24 @@ router.post(
     const { username, email, password } = req.body;
 
     try {
-      let user = await User.findOne({ email });
+      let userByEmail = await User.findOne({ email });
+      let userByName = await User.findOne({ username });
 
-      if (user) {
+      if (userByEmail) {
         return res
           .status(400)
           .json({ errors: [{ msg: 'User already exists' }] });
+      }
+
+      if (userByName) {
+        return res.status(400).json({
+          errors: [
+            {
+              msg:
+                'Username already exists. Please choose a different username.',
+            },
+          ],
+        });
       }
 
       const avatar = normalize(
@@ -48,6 +60,7 @@ router.post(
         { forceHttps: true }
       );
 
+      // create user
       user = new User({
         username,
         email,

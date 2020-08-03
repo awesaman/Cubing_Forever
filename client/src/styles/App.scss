@@ -48,6 +48,18 @@ img {
   margin-bottom: 0.4em;
 }
 
+.M {
+  font-size: 2em;
+  line-height: 1.2;
+  margin-bottom: 0.4em;
+}
+
+.S {
+  font-size: 1.5em;
+  line-height: 1.2;
+  margin-bottom: 0.2em;
+}
+
 .text-center {
   text-align: center;
 }
@@ -133,15 +145,42 @@ i.fa-users {
   font-size: 3em;
 }
 
+/* forms */
+
+.form-group {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.form input[type='text'],
+.form input[type='email'],
+.form input[type='password'],
+.form input[type='date'],
+.form select,
+.form textarea {
+  display: block;
+  width: 100%;
+  padding: 0.4em;
+  font-size: 1.2em;
+  border: none;
+}
+
+.form input[type='submit'],
+button {
+  font-family: inherit;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 /* general classes */
 
 .container {
-  max-width: 1100px;
+  max-width: 1000px;
   margin: auto;
   overflow: hidden;
   padding: 0 2em;
-  margin-top: 10%;
-  margin-bottom: 10%;
+  margin-top: 10em;
+  margin-bottom: 5em;
 }
 
 .navbar {
@@ -215,4 +254,8 @@ i.fa-users {
   align-items: center;
   margin-top: 10%;
   color: $light-color;
+}
+
+.underline {
+  text-decoration: underline;
 }
