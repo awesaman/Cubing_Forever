@@ -214,11 +214,14 @@ button {
 }
 
 .logo {
-  width: 35%;
+  width: 100%;
 }
 
 .link {
   color: $primary-color;
+}
+.link-logo {
+  width: 10em;
 }
 
 .link:hover {

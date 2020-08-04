@@ -13,6 +13,8 @@ import {
 // load user
 export const loadUser = () => async dispatch => {
   try {
+    if (localStorage.token)
+      api.defaults.headers.common['x-auth-token'] = localStorage.token;
     const res = await api.get('/auth');
 
     dispatch({
@@ -29,7 +31,7 @@ export const loadUser = () => async dispatch => {
 // register user
 export const register = formData => async dispatch => {
   try {
-    const res = await api.post('/users', formData);
+    const res = await api.post('/user', formData);
 
     dispatch({
       type: REGISTER_SUCCESS,
@@ -38,9 +40,6 @@ export const register = formData => async dispatch => {
     dispatch(loadUser());
   } catch (err) {
     const errors = err.response.data.errors;
-    console.log('hehe');
-    console.log(err.response);
-
     if (errors) {
       errors.forEach(error => dispatch(showAlert(error.msg, 'danger')));
       console.log('reached');
@@ -64,10 +63,12 @@ export const login = (email, password) => async dispatch => {
       payload: res.data,
     });
 
+    // if it was a success, we must store the token
+    localStorage.setItem('token', res.data.token);
     dispatch(loadUser());
   } catch (err) {
     const errors = err.response.data.errors;
-
+    console.log(err.response.data);
     if (errors) {
       errors.forEach(error => dispatch(showAlert(error.msg, 'danger')));
     }
