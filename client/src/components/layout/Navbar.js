@@ -1,39 +1,106 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { Fragment, useState } from 'react';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { logout } from '../../actions/auth';
 import PropTypes from 'prop-types';
 import logo from '../../img/logo.png';
 
-const Navbar = () => {
+const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
+  const [open, setOpen] = useState(false);
+
+  const onClick = () => {
+    setOpen(!open);
+    logout();
+  };
+
+  const publicLinks = (
+    <ul>
+      <li>
+        <Link className='link' to='/tutorials' onClick={() => setOpen(!open)}>
+          Tutorials
+        </Link>
+      </li>
+      <li>
+        <Link className='link' to='/timer' onClick={() => setOpen(!open)}>
+          Timer
+        </Link>
+      </li>
+      <li>
+        <Link className='link' to='/login' onClick={() => setOpen(!open)}>
+          Login
+        </Link>
+      </li>
+    </ul>
+  );
+
+  const privateLinks = (
+    <ul>
+      <li>
+        <Link className='link' to='/tutorials' onClick={() => setOpen(!open)}>
+          Tutorials
+        </Link>
+      </li>
+      <li>
+        <Link className='link' to='/trainer' onClick={() => setOpen(!open)}>
+          Trainer
+        </Link>
+      </li>
+      <li>
+        <Link className='link' to='/timer' onClick={() => setOpen(!open)}>
+          Timer
+        </Link>
+      </li>
+      <li>
+        <Link className='link' to='/' onClick={onClick}>
+          Logout
+        </Link>
+      </li>
+    </ul>
+  );
+
   return (
-    <nav className='navbar'>
-      <Link className='link-logo' to='/'>
-        <img className='logo' src={logo} alt='Cubing Forever' />
-      </Link>
-      <ul>
-        <li>
-          <Link className='link' to='/timer'>
-            Timer
-          </Link>
-        </li>
-        <li>
-          <Link className='link' to='/trainer'>
-            Trainer
-          </Link>
-        </li>
-        <li>
-          <Link className='link' to='/tutorials'>
-            Tutorials
-          </Link>
-        </li>
-        <li>
-          <Link className='link' to='/login'>
-            Login
-          </Link>
-        </li>
-      </ul>
-    </nav>
+    <Fragment>
+      <nav className='navbar'>
+        <Link className='link-logo' to='/'>
+          <img className='logo' src={logo} alt='Cubing Forever' />
+        </Link>
+        <div className='desktop'>
+          {!loading && (
+            <Fragment>{isAuthenticated ? privateLinks : publicLinks}</Fragment>
+          )}
+        </div>
+        <div className='mobile'>
+          <a
+            href='javascript:;'
+            className='L hamburger'
+            onClick={() => setOpen(!open)}
+          >
+            <i className={open ? 'fas fa-times' : 'fas fa-bars'} />
+          </a>
+        </div>
+      </nav>
+      {/* <div className='reveal'>
+        {!loading && open && (
+          <Fragment>{isAuthenticated ? privateLinks : publicLinks}</Fragment>
+        )}
+      </div> */}
+
+      {!loading && open && (
+        <div className='reveal'>
+          {isAuthenticated ? privateLinks : publicLinks}
+        </div>
+      )}
+    </Fragment>
   );
 };
 
-export default Navbar;
+Navbar.propTypes = {
+  logout: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps, { logout })(Navbar);

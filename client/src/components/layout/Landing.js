@@ -6,7 +6,7 @@ const Landing = () => {
     <section className='landing'>
       <div className='landing-inner'>
         <h1 className='XL'>CUBING FOREVER</h1>
-        <p className='L'>
+        <p className='L subheading'>
           Create an account to find friends and battle against them!
         </p>
         <div className='buttons'>

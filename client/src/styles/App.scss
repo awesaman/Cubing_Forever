@@ -5,6 +5,8 @@ $dark-color: #2d3237;
 $light-color: #f4f4f4;
 $danger-color: #d72a3b;
 $success-color: #1dd247;
+$tablet-breakpoint: 888px;
+$mobile-breakpoint: 738px;
 
 /* defaults */
 
@@ -192,7 +194,7 @@ button {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   position: fixed;
-  z-index: 1;
+  z-index: 10;
   width: 100%;
   top: 0;
   border-bottom: solid 1px $primary-color;
@@ -242,7 +244,7 @@ button {
   height: 100%;
   width: 80%;
   margin: auto;
-  padding-top: 7%;
+  padding-top: 10%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -261,4 +263,76 @@ button {
 
 .underline {
   text-decoration: underline;
+}
+
+.mobile,
+.reveal {
+  display: none;
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .L {
+    font-size: 2em;
+  }
+
+  .extras {
+    justify-content: space-between;
+    font-size: 0.8em;
+  }
+
+  .navbar {
+    padding-right: 0.5em;
+  }
+}
+
+@media (max-width: $mobile-breakpoint) {
+  .XL {
+    font-size: 5em;
+  }
+
+  .subheading {
+    font-size: 1.5em;
+  }
+
+  .buttons {
+    font-size: 0.8em;
+  }
+
+  .extras {
+    font-size: 0.6em;
+  }
+
+  .link-logo {
+    width: 8em;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    position: relative;
+    display: block;
+    padding-right: 1em;
+  }
+
+  .reveal {
+    display: flex;
+    align-items: flex-end;
+    flex-flow: column;
+    padding-right: 1em;
+    padding-top: 6em;
+    text-align: right;
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.93);
+    font-size: 1.3em;
+
+    li {
+      padding: 0.3em 1em;
+      margin-bottom: 1em;
+    }
+  }
 }
