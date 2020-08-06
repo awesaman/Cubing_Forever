@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logout } from '../../actions/auth';
 import PropTypes from 'prop-types';
@@ -41,13 +41,23 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
         </Link>
       </li>
       <li>
+        <Link className='link' to='/timer' onClick={() => setOpen(!open)}>
+          Timer
+        </Link>
+      </li>
+      {/* <li>
         <Link className='link' to='/trainer' onClick={() => setOpen(!open)}>
           Trainer
         </Link>
+      </li> */}
+      <li>
+        <Link className='link' to='/profiles' onClick={() => setOpen(!open)}>
+          Cubers
+        </Link>
       </li>
       <li>
-        <Link className='link' to='/timer' onClick={() => setOpen(!open)}>
-          Timer
+        <Link className='link' to='/dashboard' onClick={() => setOpen(!open)}>
+          Dashboard
         </Link>
       </li>
       <li>
@@ -79,11 +89,6 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
           </a>
         </div>
       </nav>
-      {/* <div className='reveal'>
-        {!loading && open && (
-          <Fragment>{isAuthenticated ? privateLinks : publicLinks}</Fragment>
-        )}
-      </div> */}
 
       {!loading && open && (
         <div className='reveal'>
