@@ -1,21 +1,34 @@
 import React, { Fragment } from 'react';
 import eventNaming from '../../utils/eventNaming.json';
+import PropTypes from 'prop-types';
 
-const Events = events => {
+const Events = ({ events }) => {
   return (
     <Fragment>
       {events.map(event => (
-        <div>
-          <img
-            src={require(`../../img/${eventNaming[event.name]}.svg`)}
-            alt={event.name}
-            className='event-img'
-          />
-          <h3>{event.name}</h3>
+        <div className='event-display'>
+          <div className='event-main'>
+            <img
+              src={require(`../../img/events/${eventNaming[event.name]}.svg`)}
+              alt={event.name}
+              className='event-img'
+            />
+            <p className='S'>{event.name}</p>
+          </div>
+          <div>
+            {event.speedrange && <p className='S'>{event.speedrange}</p>}
+            {event.single && <p className='S'>{event.single}</p>}
+            {event.avg5 && <p className='S'>{event.avg5}</p>}
+            {event.avg12 && <p className='S'>{event.avg12}</p>}
+          </div>
         </div>
       ))}
     </Fragment>
   );
+};
+
+Events.propTypes = {
+  events: PropTypes.array.isRequired,
 };
 
 export default Events;

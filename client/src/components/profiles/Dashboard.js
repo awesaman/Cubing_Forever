@@ -25,11 +25,13 @@ const Dashboard = ({
         <Fragment>
           <div className='info'>
             <div className='first'>
-              <img
-                src={user.avatar}
-                alt='Please provide an avatar through Gravatar'
-                className='avatar'
-              />
+              {user && (
+                <img
+                  src={user.avatar}
+                  alt='Please provide an avatar through Gravatar'
+                  className='avatar'
+                />
+              )}
             </div>
             <div className='second'>
               {profile.bio && (
@@ -50,6 +52,7 @@ const Dashboard = ({
                   <a
                     href={`https://www.worldcubeassociation.org/persons/${profile.wcaid}`}
                     target='_blank'
+                    rel='noopener noreferrer'
                     className='underline'
                   >
                     {profile.wcaid}
@@ -59,7 +62,8 @@ const Dashboard = ({
             </div>
           </div>
 
-          <Events events={profile.events} />
+          {profile.events && <Events events={profile.events} />}
+          {/* {console.log(profile.events)} */}
 
           <div className='buttons'>
             <Link to='/edit-profile' className='btn btn-light'>
