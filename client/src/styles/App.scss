@@ -133,6 +133,10 @@ img {
 
 /* font awesome */
 
+.fa-2x {
+  margin-right: 0.5em;
+}
+
 i.fa-twitter {
   color: #38a1f3;
 }
@@ -181,6 +185,10 @@ button {
   font-family: inherit;
   margin-top: 1em;
   margin-bottom: 1em;
+}
+
+.social-input {
+  display: flex;
 }
 
 /* general classes */

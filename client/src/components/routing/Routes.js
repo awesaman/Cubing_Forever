@@ -9,6 +9,7 @@ import Timer from '../timer/Timer';
 import Tutorials from '../tutorials/Tutorials';
 import Profiles from '../profiles/Profiles';
 import PrivateRoute from './PrivateRoute';
+import ProfileForm from '../profiles/ProfileForm';
 
 const Routes = () => {
   return (
@@ -21,6 +22,8 @@ const Routes = () => {
         <Route exact path='/timer' component={Timer} />
         <PrivateRoute exact path='/profiles' component={Profiles} />
         <PrivateRoute exact path='/dashboard' component={Dashboard} />
+        <PrivateRoute exact path='/create-profile' component={ProfileForm} />
+        <PrivateRoute exact path='/edit-profile' component={ProfileForm} />
         <Route component={NotFound} />
       </Switch>
     </section>
