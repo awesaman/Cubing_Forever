@@ -1,11 +1,48 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import Loading from '../layout/Loading';
+import ProfileItem from './ProfileItem';
+import { getProfiles } from '../../actions/profile';
 
-const Profiles = () => {
+const Profiles = ({ getProfiles, profile: { profiles, loading } }) => {
+  useEffect(() => {
+    getProfiles();
+  }, [getProfiles]);
+
   return (
     <Fragment>
-      <h1 className='L'>Cubers</h1>
+      {loading ? (
+        <Loading />
+      ) : (
+        <Fragment>
+          <h1 className='large text-primary'>Cuber Profiles</h1>
+          <p className='lead'>
+            <i className='fab fa-connectdevelop' /> Browse and connect with
+            developers
+          </p>
+          <div className='profiles'>
+            {profiles.length > 0 ? (
+              profiles.map(profile => (
+                <ProfileItem key={profile._id} profile={profile} />
+              ))
+            ) : (
+              <h4>No profiles found...</h4>
+            )}
+          </div>
+        </Fragment>
+      )}
     </Fragment>
   );
 };
 
-export default Profiles;
+Profiles.propTypes = {
+  getProfiles: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = state => ({
+  profile: state.profile,
+});
+
+export default connect(mapStateToProps, { getProfiles })(Profiles);

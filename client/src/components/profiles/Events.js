@@ -16,10 +16,9 @@ const Events = ({ events }) => {
             <p className='S'>{event.name}</p>
           </div>
           <div>
-            {event.speedrange && <p className='S'>{event.speedrange}</p>}
-            {event.single && <p className='S'>{event.single}</p>}
-            {event.avg5 && <p className='S'>{event.avg5}</p>}
-            {event.avg12 && <p className='S'>{event.avg12}</p>}
+            {event.single && <p className='S'>Single - {event.single}</p>}
+            {event.avg5 && <p className='S'>Avg 5 - {event.avg5}</p>}
+            {event.avg12 && <p className='S'>Avg 12 - {event.avg12}</p>}
           </div>
         </div>
       ))}

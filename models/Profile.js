@@ -20,17 +20,14 @@ const ProfileSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      speedrange: {
+      single: {
         type: String,
       },
-      single: {
-        type: Number,
-      },
       avg5: {
-        type: Number,
+        type: String,
       },
       avg12: {
-        type: Number,
+        type: String,
       },
       solves: [
         {

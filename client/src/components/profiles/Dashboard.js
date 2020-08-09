@@ -63,7 +63,6 @@ const Dashboard = ({
           </div>
 
           {profile.events && <Events events={profile.events} />}
-          {/* {console.log(profile.events)} */}
 
           <div className='buttons'>
             <Link to='/edit-profile' className='btn btn-light'>

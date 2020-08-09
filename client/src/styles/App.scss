@@ -113,14 +113,24 @@ img {
   }
 }
 
+.btn-success {
+  background: $success-color;
+  color: $light-color;
+  &:hover {
+    color: $dark-color;
+  }
+}
+
 /* alerts */
 
 .alert {
+  position: fixed;
   padding: 0.8rem;
   margin: 1rem 0;
   opacity: 0.9;
   background: $primary-color;
   color: $light-color;
+  z-index: 30;
 }
 
 .alert-danger {
@@ -170,7 +180,7 @@ i.fa-users {
 .form input[type='text'],
 .form input[type='email'],
 .form input[type='password'],
-.form input[type='date'],
+.form input[type='number'],
 .form select,
 .form textarea {
   display: block;
@@ -178,6 +188,7 @@ i.fa-users {
   padding: 0.4em;
   font-size: 1.2em;
   border: none;
+  font-family: inherit;
 }
 
 .form input[type='submit'],
@@ -301,6 +312,10 @@ button {
 .event-img {
   width: 6em;
   margin: 0 1em;
+}
+
+.mleft {
+  margin-left: 5em;
 }
 
 .mobile,
