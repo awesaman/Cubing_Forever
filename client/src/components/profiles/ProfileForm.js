@@ -150,8 +150,8 @@ const ProfileForm = ({
             <option value='3x3 Blindfolded'>3x3 Blindfolded</option>
             <option value='3x3 Multi-Blind'>3x3 Multi-Blind</option>
             <option value='3x3 Fewest Moves'>3x3 Fewest Moves</option>
-            <option value='4x4 Blindfolded'>3x3 Blindfolded</option>
-            <option value='5x5 Blindfolded'>3x3 Blindfolded</option>
+            <option value='4x4 Blindfolded'>4x4 Blindfolded</option>
+            <option value='5x5 Blindfolded'>5x5 Blindfolded</option>
             <option value='Pyraminx'>Pyraminx</option>
             <option value='Megaminx'>Megaminx</option>
             <option value='Square-1'>Square-1</option>
@@ -220,14 +220,16 @@ const ProfileForm = ({
       </p>
       <form className='form' onSubmit={onSubmit}>
         <div className='form-group'>
-          <textarea
+          <input
+            type='text'
             placeholder='A short bio of yourself'
             name='bio'
             value={bio}
             onChange={onChange}
           />
           <small className='form-text'>
-            Feel free to include any general information about yourself.
+            Feel free to include any general information about yourself. Keep it
+            short!
           </small>
         </div>
 
@@ -260,7 +262,6 @@ const ProfileForm = ({
         </div>
 
         <p className='M'>Events</p>
-        <small>Events are required</small>
         {formData.events &&
           formData.events.map(event => (
             <Fragment>
@@ -275,17 +276,17 @@ const ProfileForm = ({
                   />
                   <p className='S'>{event.name}</p>
                 </div>
-                <div className='mleft'>
+                <div>
                   {event.single && <p className='S'>Single - {event.single}</p>}
                   {event.avg5 && <p className='S'>Avg 5 - {event.avg5}</p>}
                   {event.avg12 && <p className='S'>Avg 12 - {event.avg12}</p>}
                 </div>
 
-                <div>
+                <div className='buttons edit'>
                   <button
                     onClick={() => modifyEvent(event.name, true)}
                     type='button'
-                    className='btn btn-light mleft'
+                    className='btn btn-light'
                   >
                     Edit Event
                   </button>
@@ -309,9 +310,12 @@ const ProfileForm = ({
             </button>
           </div>
         ) : (
-          <button onClick={openNew} type='button' className='btn btn-primary'>
-            Add Event
-          </button>
+          <div className='buttons'>
+            <button onClick={openNew} type='button' className='btn btn-primary'>
+              Add Event
+            </button>
+            <span> *Events are required</span>
+          </div>
         )}
 
         <div className='buttons'>
@@ -372,11 +376,12 @@ const ProfileForm = ({
             </div>
           </Fragment>
         )}
-
-        <input type='submit' className='btn btn-success' value='Save' />
-        <Link className='btn btn-light' to='/dashboard'>
-          Go Back
-        </Link>
+        <div className='buttons'>
+          <input type='submit' className='btn btn-success' value='Save' />
+          <Link className='btn btn-light' to='/dashboard'>
+            Go Back
+          </Link>
+        </div>
       </form>
     </Fragment>
   );

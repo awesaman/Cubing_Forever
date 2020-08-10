@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import Alert from '../layout/Alert';
 import NotFound from '../layout/NotFound';
@@ -10,23 +10,27 @@ import Tutorials from '../tutorials/Tutorials';
 import Profiles from '../profiles/Profiles';
 import PrivateRoute from './PrivateRoute';
 import ProfileForm from '../profiles/ProfileForm';
+import DisplayProfile from '../profiles/DisplayProfile';
 
 const Routes = () => {
   return (
-    <section className='container'>
+    <Fragment>
       <Alert />
-      <Switch>
-        <Route exact path='/register' component={Register} />
-        <Route exact path='/login' component={Login} />
-        <Route exact path='/tutorials' component={Tutorials} />
-        <Route exact path='/timer' component={Timer} />
-        <PrivateRoute exact path='/profiles' component={Profiles} />
-        <PrivateRoute exact path='/dashboard' component={Dashboard} />
-        <PrivateRoute exact path='/create-profile' component={ProfileForm} />
-        <PrivateRoute exact path='/edit-profile' component={ProfileForm} />
-        <Route component={NotFound} />
-      </Switch>
-    </section>
+      <section className='container'>
+        <Switch>
+          <Route exact path='/register' component={Register} />
+          <Route exact path='/login' component={Login} />
+          <Route exact path='/tutorials' component={Tutorials} />
+          <Route exact path='/timer' component={Timer} />
+          <PrivateRoute exact path='/profile/:id' component={DisplayProfile} />
+          <PrivateRoute exact path='/profiles' component={Profiles} />
+          <PrivateRoute exact path='/dashboard' component={Dashboard} />
+          <PrivateRoute exact path='/create-profile' component={ProfileForm} />
+          <PrivateRoute exact path='/edit-profile' component={ProfileForm} />
+          <Route component={NotFound} />
+        </Switch>
+      </section>
+    </Fragment>
   );
 };
 

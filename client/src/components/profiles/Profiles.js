@@ -16,11 +16,12 @@ const Profiles = ({ getProfiles, profile: { profiles, loading } }) => {
         <Loading />
       ) : (
         <Fragment>
-          <h1 className='large text-primary'>Cuber Profiles</h1>
-          <p className='lead'>
+          <h1 className='L'>Profiles</h1>
+          <p className='S'>
             <i className='fab fa-connectdevelop' /> Browse and connect with
-            developers
+            cubers around the world
           </p>
+
           <div className='profiles'>
             {profiles.length > 0 ? (
               profiles.map(profile => (
