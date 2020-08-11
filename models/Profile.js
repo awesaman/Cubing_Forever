@@ -30,10 +30,13 @@ const ProfileSchema = new mongoose.Schema({
         type: String,
       },
       solves: [
-        {
-          time: { type: Number },
-          scramble: { type: String },
-        },
+        [
+          {
+            time: { type: Number },
+            scramble: { type: String },
+            date: { type: Date, default: Date.now },
+          },
+        ],
       ],
     },
   ],

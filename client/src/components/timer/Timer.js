@@ -1,25 +1,7 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import eventNaming from '../../utils/eventNaming.json';
-// const Scrambow = require('scrambow');
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
-
-const useKey = (key, cb) => {
-  const callbackRef = useRef(cb);
-
-  useEffect(() => {
-    callbackRef.current = cb;
-  });
-
-  useEffect(() => {
-    const handle = e => {
-      if (e.code === key) {
-        callbackRef.current(e);
-      }
-    };
-    document.addEventListener('keypress', handle);
-    return () => document.removeEventListener('keypress', handle);
-  }, []);
-};
+import useKey from '../../utils/useKey';
 
 const Timer = () => {
   const [event, setEvent] = useState('3x3');
@@ -55,21 +37,22 @@ const Timer = () => {
   };
 
   const reset = () => {
-    clearInterval(interv);
-    setStatus('stopped');
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
+    clearInterval(interv);
+    newcs = news = newm = newh = 0;
   };
 
   const start = () => {
     reset();
-    run();
     setStatus('started');
+    run();
     setInterv(setInterval(run, 10));
   };
 
   const stop = () => {
     clearInterval(interv);
     setStatus('stopped');
+    generateScramble();
   };
 
   const generateScramble = () => {
@@ -87,8 +70,6 @@ const Timer = () => {
   };
 
   const handleSpace = () => {
-    console.log(time.h, time.m, time.s, time.cs);
-    console.log(status);
     if (status === 'stopped') start();
     if (status === 'started') stop();
   };
@@ -138,6 +119,20 @@ const Timer = () => {
         <div className='sidebar'>
           <div className='mbottom'>
             <h1 className='M'>Options</h1>
+            {solves.length === 0 && (
+              <button
+                className='btn btn-light btn-small'
+                onClick={() => generateScramble()}
+              >
+                Continue Previous Session
+              </button>
+            )}
+            <button
+              className='btn btn-light btn-small'
+              onClick={() => generateScramble()}
+            >
+              Clear Session
+            </button>
             <button
               className='btn btn-light btn-small'
               onClick={() => generateScramble()}
@@ -177,9 +172,18 @@ const Timer = () => {
         </div>
         <div>
           <h1 className='XL'>
-            {time.h > 0 && <span>{time.h}:</span>}
-            {time.m > 0 && <span>{time.m}:</span>}
-            {time.s}.{time.cs >= 10 ? time.cs : '0' + time.cs}
+            {time.h > 0 && (
+              <span>
+                {time.h}:{time.m < 10 && '0'}
+              </span>
+            )}
+            {time.m > 0 && (
+              <span>
+                {time.m}:{time.s < 10 && '0'}
+              </span>
+            )}
+            {time.s}.{time.cs < 10 && '0'}
+            {time.cs}
           </h1>
           <p>Scramble: {scramble}</p>
         </div>
