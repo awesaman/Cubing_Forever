@@ -1,51 +1,24 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import eventNaming from '../../utils/eventNaming.json';
-import scrambo from 'scrambo';
-const Scrambo = require('scrambo');
+// const Scrambow = require('scrambow');
+import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
 
 const Timer = () => {
   const [event, setEvent] = useState('3x3');
   const [scramble, setScramble] = useState('Loading...');
 
-  const getEvent = () => {
-    let res = eventNaming[event];
-    let len = -1;
-    let nxn = false;
-    let n = res[1];
-    if (res[0] === n && n === res[2]) {
-      res = res.slice(0, 3);
-      if (n === '2') len = 11;
-      if (n === '3') len = 20;
-      if (n === '4') len = 40;
-      if (n === '5') len = 60;
-      if (n === '6') len = 80;
-      if (n === '7') len = 100;
-      nxn = true;
-    }
-    return [res, len, nxn];
+  const generateScramble = () => {
+    let ev = eventNaming[event];
+    if (ev.slice(0, 3) === '333' && ev !== '333fm') ev = '333';
+    if (ev.slice(0, 3) === '444') ev = '444';
+    if (ev.slice(0, 3) === '555') ev = '555';
+    const seeded_scramble = new Scrambow().setType(ev).get();
+    setScramble(seeded_scramble[0].scramble_string);
   };
 
-  const generateScramble = () => {
-    const ev = getEvent();
-    console.log(ev);
-    var seeded_scramble;
-    if (ev[2] === true)
-      seeded_scramble = new Scrambo()
-        .type(ev[0])
-        .seed(new Date().getTime())
-        .length(ev[1])
-        .get();
-    else
-      seeded_scramble = new Scrambo()
-        .type(ev[0])
-        .seed(new Date().getTime())
-        .get();
-    setScramble(seeded_scramble);
-  };
   const changeEvent = e => {
     setEvent(e.target.value);
     generateScramble();
-    console.log(event);
   };
 
   useEffect(() => {
@@ -80,7 +53,8 @@ const Timer = () => {
         </button>
       </span>
       <h1 className='XL'>{event}</h1>
-      <p className='S'>Scramble: {scramble}</p>
+      <p>Scramble: {scramble}</p>
+      <p className='S'>Solves: {scramble}</p>
     </Fragment>
   );
 };

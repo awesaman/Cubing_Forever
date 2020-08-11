@@ -21,10 +21,9 @@
     "express-validator": "^6.6.0",
     "gravatar": "^1.8.1",
     "jsonwebtoken": "^8.5.1",
-    "jsss": "0.0.41",
     "mongoose": "^5.9.26",
     "request": "^2.88.2",
-    "scrambo": "^0.3.0",
+    "typescript": "^3.9.7",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
