@@ -325,12 +325,16 @@ button {
   margin-left: 5em;
 }
 
+.mright {
+  margin-right: 2em;
+}
+
 .mtop {
   margin-top: 2em;
 }
 
-.mright {
-  margin-right: 2em;
+.mbottom {
+  margin-bottom: 2em;
 }
 
 .profile {
@@ -365,6 +369,51 @@ button {
 
 .all-events {
   grid-column: 1 / 3;
+}
+
+.timer {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-gap: 2em;
+  padding: 1em 1em;
+  margin-bottom: 1em;
+  overflow: wrap;
+}
+
+.sidebar {
+  grid-row: span 4;
+}
+
+.solves {
+  height: 150px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.timer-top {
+  display: flex;
+  align-items: center;
+}
+
+.event-picker {
+  display: inline-block;
+  padding: 0.4em;
+  border: none;
+  font-family: inherit;
+  font-size: 1em;
+  margin: 1em 1em;
+}
+
+.small-image {
+  display: inline-block;
+  width: 2em;
+  margin: 0;
+}
+
+.btn-small {
+  font-size: 1em;
+  margin: 0.5em 0.5em;
 }
 
 .mobile,
