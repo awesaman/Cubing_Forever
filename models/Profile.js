@@ -34,6 +34,7 @@ const ProfileSchema = new mongoose.Schema({
           {
             time: { type: Number },
             scramble: { type: String },
+            penalty: { type: String },
             date: { type: Date, default: Date.now },
           },
         ],

@@ -123,11 +123,11 @@ router.post(
 // @desc     Add solve
 // @access   Private
 router.put(
-  '/solve',
+  '/solve/:event',
   [
     auth,
     [
-      check('event', 'Event is required').not().isEmpty(),
+      check('sessionID', 'Session ID is required').not().isEmpty(),
       check('time', 'Time is required').not().isEmpty(),
       check('scramble', 'Scramble is required').not().isEmpty(),
     ],
@@ -138,16 +138,17 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { event, time, scramble } = req.body;
-
+    let { sessionID, time, scramble } = req.body;
+    sessionID -= 1;
     const newSolve = { time, scramble };
-    console.log('reached');
 
     try {
       const profile = await Profile.findOne({ user: req.user.id });
       for (e in profile.events) {
-        if (profile.events[e].name === event) {
-          profile.events[e].solves.push(newSolve);
+        if (profile.events[e].name === req.params.event) {
+          if (profile.events[e].solves.length === sessionID)
+            profile.events[e].solves.push([newSolve]);
+          else profile.events[e].solves[sessionID].push(newSolve);
           break;
         }
       }
@@ -160,18 +161,18 @@ router.put(
   }
 );
 
-// @route    DELETE api/profile/solve/:event/:id
+// @route    DELETE api/profile/solve/:event/:session/:id
 // @desc     Delete a solve
 // @access   Private
 
-router.delete('/solve/:event/:id', auth, async (req, res) => {
+router.delete('/solve/:event/:session/:id', auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
     for (e in profile.events) {
       if (profile.events[e].name === req.params.event) {
-        profile.events[e].solves = profile.events[e].solves.filter(
-          sol => sol._id.toString() !== req.params.id
-        );
+        profile.events[e].solves = profile.events[e].solves[
+          req.params.session - 1
+        ].filter(sol => sol._id.toString() !== req.params.id);
         break;
       }
     }
