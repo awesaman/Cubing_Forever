@@ -18,8 +18,8 @@ const Profiles = ({ getProfiles, profile: { profiles, loading } }) => {
         <Fragment>
           <h1 className='L'>Profiles</h1>
           <p className='S'>
-            <i className='fab fa-connectdevelop' /> Browse and connect with
-            cubers around the world
+            <i className='fab fa-connectdevelop' /> Connect with cubers around
+            the world
           </p>
 
           <div className='profiles'>

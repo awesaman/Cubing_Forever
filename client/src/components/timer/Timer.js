@@ -2,14 +2,17 @@ import React, { Fragment, useState, useEffect, useRef } from 'react';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
 import useKey from '../../utils/useKey';
+import { getSession } from '../../actions/solve';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-const Timer = () => {
+const Timer = ({ getSession, solve: { solves } }) => {
   const [event, setEvent] = useState('3x3');
+  const [displaySolve, setDisplaySolve] = useState(solves.length - 1);
   const [scramble, setScramble] = useState('Loading...');
   const [inspection, toggleInspection] = useState(false);
   const [P2, toggleP2] = useState(false);
   const [DNF, toggleDNF] = useState(false);
-  const [solves, setSolves] = useState([]);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
   const [interv, setInterv] = useState();
   const [status, setStatus] = useState('stopped');
@@ -53,6 +56,7 @@ const Timer = () => {
     clearInterval(interv);
     setStatus('stopped');
     generateScramble();
+    setDisplaySolve(solves.length - 1);
   };
 
   const generateScramble = () => {
@@ -62,6 +66,11 @@ const Timer = () => {
     if (ev.slice(0, 3) === '555') ev = '555';
     const seeded_scramble = new Scrambow().setType(ev).get();
     setScramble(seeded_scramble[0].scramble_string);
+  };
+
+  const getNewSession = event => {
+    // change to Create New Session
+    getSession(event);
   };
 
   const changeEvent = e => {
@@ -76,6 +85,7 @@ const Timer = () => {
 
   useEffect(() => {
     generateScramble();
+    getSession(event);
   }, [event]);
 
   useKey('Space', handleSpace);
@@ -122,7 +132,7 @@ const Timer = () => {
             {solves.length === 0 && (
               <button
                 className='btn btn-light btn-small'
-                onClick={() => generateScramble()}
+                onClick={() => getNewSession(event)}
               >
                 Continue Previous Session
               </button>
@@ -188,11 +198,30 @@ const Timer = () => {
           <p>Scramble: {scramble}</p>
         </div>
         <div className='solves'>
-          <p className='S'>Solves: highlight highest and lowest</p>
+          <p className='S inline'>Solves </p>
+          <small className='inline'>
+            (click on a solve to reveal info about it)
+          </small>
+          <br />
+          {solves.map(sol => (
+            <span
+              className='pointer-cursor'
+              onClick={() => setDisplaySolve(solves.indexOf(sol))}
+            >
+              {sol.time},{' '}
+            </span>
+          ))}
         </div>
         <div>
-          {solves.length > 0 && (
-            <p className='S'>Click on a solve to reveal info about it </p>
+          {solves.length > 0 && displaySolve >= 0 && (
+            <Fragment>
+              <p className='S'>Solve Info</p>
+              <p>Time: {solves[displaySolve].time}</p>
+              <p>Scramble: {solves[displaySolve].scramble}</p>
+              <button className='btn btn-danger btn-small' onClick={getSession}>
+                Delete
+              </button>
+            </Fragment>
           )}
         </div>
       </div>
@@ -200,4 +229,13 @@ const Timer = () => {
   );
 };
 
-export default Timer;
+Timer.propTypes = {
+  getSession: PropTypes.func.isRequired,
+  solve: PropTypes.array.isRequired,
+};
+
+const mapStateToProps = state => ({
+  solve: state.solve,
+});
+
+export default connect(mapStateToProps, { getSession })(Timer);

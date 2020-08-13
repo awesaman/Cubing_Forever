@@ -119,6 +119,33 @@ router.post(
   }
 );
 
+// @route    GET api/profile/solve/:event
+// @desc     Get last solving session for an event
+// @access   Private
+
+router.get('/solve/:event', auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({
+      user: req.user.id,
+    }).populate('user', ['username', 'avatar']);
+
+    if (!profile) {
+      return res.status(400).json({ msg: 'There is no profile for this user' });
+    }
+
+    for (e in profile.events) {
+      const ev = profile.events[e];
+      if (ev.name === req.params.event) {
+        res.json(ev.solves[ev.solves.length - 1]);
+        break;
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 // @route    PUT api/profile/solve
 // @desc     Add solve
 // @access   Private
@@ -145,8 +172,9 @@ router.put(
     try {
       const profile = await Profile.findOne({ user: req.user.id });
       for (e in profile.events) {
-        if (profile.events[e].name === req.params.event) {
-          if (profile.events[e].solves.length === sessionID)
+        const ev = profile.events[e];
+        if (ev.name === req.params.event) {
+          if (ev.solves.length === sessionID)
             profile.events[e].solves.push([newSolve]);
           else profile.events[e].solves[sessionID].push(newSolve);
           break;
@@ -167,17 +195,23 @@ router.put(
 
 router.delete('/solve/:event/:session/:id', auth, async (req, res) => {
   try {
-    const profile = await Profile.findOne({ user: req.user.id });
+    let profile = await Profile.findOne({ user: req.user.id });
     for (e in profile.events) {
-      if (profile.events[e].name === req.params.event) {
-        profile.events[e].solves = profile.events[e].solves[
-          req.params.session - 1
-        ].filter(sol => sol._id.toString() !== req.params.id);
+      const ev = profile.events[e];
+      if (ev.name === req.params.event) {
+        profile.events[e].solves[req.params.session - 1] = profile.events[
+          e
+        ].solves[req.params.session - 1].filter(
+          sol => sol._id.toString() !== req.params.id
+        );
         break;
       }
     }
-    await profile.save();
-    return res.status(200).json(profile);
+
+    profile.markModified('events'); //this tells mongoose to look for changes in events array
+    await profile.save(); // saves changes to mongoose
+
+    return res.status(200).json(profile.events);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: 'Server error' });
