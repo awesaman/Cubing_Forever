@@ -1,6 +1,13 @@
 import api from '../utils/api';
 
-import { GET_SOLVES, SOLVE_SUCCESS, SOLVE_FAIL } from './types';
+import {
+  GET_SOLVES,
+  CLEAR_SOLVES,
+  SOLVE_ERROR,
+  ADD_SOLVE,
+  ADD_SESSION,
+  DELETE_SOLVE,
+} from './types';
 
 // Get last session
 export const getSession = event => async dispatch => {
@@ -14,8 +21,62 @@ export const getSession = event => async dispatch => {
     });
   } catch (err) {
     dispatch({
-      type: SOLVE_FAIL,
-      payload: { msg: err.response.statusText, status: err.response.status },
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Add a solve
+export const addSolve = (event, sol) => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.put(`/profile/solve/${ev}`, sol);
+
+    dispatch({
+      type: ADD_SOLVE,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Create a new session
+export const newSession = event => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.put(`/profile/session/${ev}`);
+
+    dispatch({
+      type: ADD_SESSION,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Clear current session
+export const clearSession = event => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.delete(`/profile/solve/${ev}`);
+
+    dispatch({
+      type: CLEAR_SOLVES,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
     });
   }
 };

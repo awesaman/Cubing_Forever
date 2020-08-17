@@ -18,6 +18,7 @@ const initialState = {
   single: '',
   avg5: '',
   avg12: '',
+  solves: [[]],
 };
 
 const ProfileForm = ({
@@ -59,6 +60,7 @@ const ProfileForm = ({
     single,
     avg5,
     avg12,
+    solves,
   } = formData;
 
   const close = () => {
@@ -86,13 +88,13 @@ const ProfileForm = ({
   };
 
   const addEvent = () => {
-    console.log('reach');
     if (name === null) return;
     const ev = {
       name: name,
       single: single,
       avg5: avg5,
       avg12: avg12,
+      solves: solves,
     };
     events.push(ev);
     setEditEvent(null);

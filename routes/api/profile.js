@@ -7,8 +7,6 @@ const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
 
-// add a note that they must enter all events that they practice so interface can be customized for them
-
 // @route    GET api/profile/me
 // @desc     Get logged in user's profile
 // @access   Private
@@ -146,7 +144,7 @@ router.get('/solve/:event', auth, async (req, res) => {
   }
 });
 
-// @route    PUT api/profile/solve
+// @route    PUT api/profile/solve/:event
 // @desc     Add solve
 // @access   Private
 router.put(
@@ -154,7 +152,6 @@ router.put(
   [
     auth,
     [
-      check('sessionID', 'Session ID is required').not().isEmpty(),
       check('time', 'Time is required').not().isEmpty(),
       check('scramble', 'Scramble is required').not().isEmpty(),
     ],
@@ -165,8 +162,7 @@ router.put(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    let { sessionID, time, scramble } = req.body;
-    sessionID -= 1;
+    let { time, scramble } = req.body;
     const newSolve = { time, scramble };
 
     try {
@@ -174,14 +170,12 @@ router.put(
       for (e in profile.events) {
         const ev = profile.events[e];
         if (ev.name === req.params.event) {
-          if (ev.solves.length === sessionID)
-            profile.events[e].solves.push([newSolve]);
-          else profile.events[e].solves[sessionID].push(newSolve);
+          profile.events[e].solves[ev.solves.length - 1].push(newSolve);
+          await profile.save();
+          res.json(profile.events[e].solves[ev.solves.length - 1]);
           break;
         }
       }
-      await profile.save();
-      res.json(profile);
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server Error');
@@ -189,29 +183,69 @@ router.put(
   }
 );
 
-// @route    DELETE api/profile/solve/:event/:session/:id
+// @route    PUT api/profile/session/:event
+// @desc     Add a new solving session
+// @access   Private
+
+router.put('/session/:event', auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+    for (e in profile.events) {
+      const ev = profile.events[e];
+      if (ev.name === req.params.event) {
+        profile.events[e].solves.push([]);
+        await profile.save();
+        return res.json(profile.events[e].solves[ev.solves.length - 1]);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route    DELETE api/profile/solve/:event/:id
 // @desc     Delete a solve
 // @access   Private
 
-router.delete('/solve/:event/:session/:id', auth, async (req, res) => {
+router.delete('/solve/:event/:id', auth, async (req, res) => {
   try {
     let profile = await Profile.findOne({ user: req.user.id });
     for (e in profile.events) {
       const ev = profile.events[e];
       if (ev.name === req.params.event) {
-        profile.events[e].solves[req.params.session - 1] = profile.events[
-          e
-        ].solves[req.params.session - 1].filter(
-          sol => sol._id.toString() !== req.params.id
-        );
-        break;
+        profile.events[e].solves[ev.solves.length - 1] = ev.solves[
+          ev.solves.length - 1
+        ].filter(sol => sol._id.toString() !== req.params.id);
+        profile.markModified('events'); //this tells mongoose to look for changes in events array
+        await profile.save(); // saves changes to mongoose
+        return res
+          .status(200)
+          .json(profile.events[e].solves[ev.solves.length - 1]);
       }
     }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+});
 
-    profile.markModified('events'); //this tells mongoose to look for changes in events array
-    await profile.save(); // saves changes to mongoose
+// @route    DELETE api/profile/solve/:event
+// @desc     Delete current session
+// @access   Private
 
-    return res.status(200).json(profile.events);
+router.delete('/solve/:event/', auth, async (req, res) => {
+  try {
+    let profile = await Profile.findOne({ user: req.user.id });
+    for (e in profile.events) {
+      const ev = profile.events[e];
+      if (ev.name === req.params.event) {
+        profile.events[e].solves[ev.solves.length - 1] = [];
+        profile.markModified('events'); //this tells mongoose to look for changes in events array
+        await profile.save(); // saves changes to mongoose
+        return res.status(200).json(profile.events);
+      }
+    }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: 'Server error' });

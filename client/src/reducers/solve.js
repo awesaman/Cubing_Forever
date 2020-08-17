@@ -1,4 +1,10 @@
-import { GET_SOLVES, SOLVE_SUCCESS, SOLVE_FAIL } from '../actions/types';
+import {
+  GET_SOLVES,
+  CLEAR_SOLVES,
+  SOLVE_ERROR,
+  ADD_SOLVE,
+  DELETE_SOLVE,
+} from '../actions/types';
 
 const initialState = {
   solves: [],
@@ -10,18 +16,19 @@ export default function (state = initialState, action) {
 
   switch (type) {
     case GET_SOLVES:
+    case ADD_SOLVE:
       return {
         ...state,
         solves: payload,
         loading: false,
       };
-    case SOLVE_SUCCESS:
+    case CLEAR_SOLVES:
       return {
         ...state,
         solves: payload,
-        loading: false,
+        loading: true,
       };
-    case SOLVE_FAIL:
+    case SOLVE_ERROR:
       return {
         ...state,
         ...payload,
