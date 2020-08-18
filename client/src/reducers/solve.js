@@ -7,7 +7,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-  solves: [],
+  session: {},
   loading: true,
 };
 
@@ -19,14 +19,14 @@ export default function (state = initialState, action) {
     case ADD_SOLVE:
       return {
         ...state,
-        solves: payload,
+        session: payload,
         loading: false,
       };
     case DELETE_SOLVE:
     case CLEAR_SOLVES:
       return {
         ...state,
-        solves: payload,
+        session: payload,
         loading: true,
       };
     case SOLVE_ERROR:

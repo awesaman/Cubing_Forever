@@ -9,6 +9,7 @@ import {
   addSolve,
   deleteSolve,
 } from '../../actions/solve';
+import { getCurrentProfile } from '../../actions/profile';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -18,29 +19,19 @@ const Timer = ({
   clearSession,
   addSolve,
   deleteSolve,
-  solve: { solves, loading },
+  getCurrentProfile,
+  profile: { profile },
+  solve: { session, loading },
 }) => {
   // state
   const [event, setEvent] = useState('3x3');
-  const [displaySolve, setDisplaySolve] = useState(solves.length - 1);
+  const [displaySolve, setDisplaySolve] = useState(-1);
   const [scramble, setScramble] = useState('Loading...');
   const [showMo3, toggleShowMo3] = useState(false);
   const [inspection, toggleInspection] = useState(false);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
   const [interv, setInterv] = useState();
   const [status, setStatus] = useState('ready');
-
-  // variables for averages
-  let bavg5 = Number.MAX_SAFE_INTEGER,
-    cavg5 = Number.MAX_SAFE_INTEGER,
-    bmo3 = Number.MAX_SAFE_INTEGER,
-    cmo3 = Number.MAX_SAFE_INTEGER,
-    bavg12 = Number.MAX_SAFE_INTEGER,
-    cavg12 = Number.MAX_SAFE_INTEGER,
-    bavg50 = Number.MAX_SAFE_INTEGER,
-    cavg50 = Number.MAX_SAFE_INTEGER,
-    bavg100 = Number.MAX_SAFE_INTEGER,
-    cavg100 = Number.MAX_SAFE_INTEGER;
 
   // variables for time
   var newcs = time.cs,
@@ -131,21 +122,6 @@ const Timer = ({
     return result;
   };
 
-  const average = (range, mean = false) => {
-    let sum = 0,
-      i = solves.length - range;
-    let best = solves[i].time,
-      worst = solves[i].time;
-    for (i = solves.length - range; i < solves.length; i += 1) {
-      sum += solves[i].time;
-      best = Math.min(solves[i].time, best);
-      worst = Math.max(solves[i].time, worst);
-    }
-    if (!mean) sum -= worst + best;
-    let divisor = mean ? range : range - 2;
-    return sum / divisor;
-  };
-
   // handling all options available to the user
   const changeEvent = async e => {
     await setEvent(e.target.value);
@@ -153,7 +129,7 @@ const Timer = ({
   };
 
   const removeSolve = () => {
-    deleteSolve(event, solves[displaySolve]._id);
+    deleteSolve(event, session.solves[displaySolve]._id);
     setDisplaySolve(displaySolve - 1);
   };
 
@@ -169,22 +145,17 @@ const Timer = ({
 
   // functions to run when state changes
   useEffect(() => {
-    if (solves.length > 0) setDisplaySolve(solves.length - 1);
-    else setDisplaySolve(-1);
+    if (!profile) getCurrentProfile();
     getSession(event);
-    if (solves.length >= 5) cmo3 = average(3, true);
-    if (solves.length >= 5) cavg5 = average(5);
-    if (solves.length >= 12) cavg12 = average(12);
-    if (solves.length >= 50) cavg50 = average(50);
-    if (solves.length >= 100) cavg100 = average(100);
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
   }, [event, loading]);
 
   useEffect(() => {
-    if (solves.length > 0) setDisplaySolve(solves.length - 1);
+    if (session.solves && session.solves.length > 0)
+      setDisplaySolve(session.solves.length - 1);
     else setDisplaySolve(-1);
     generateScramble();
-  }, [solves]);
+  }, [session.solves]);
 
   useSpace('keyup', handleUp);
   useSpace('keydown', handleDown);
@@ -206,29 +177,16 @@ const Timer = ({
             value={event}
             onChange={changeEvent}
           >
-            <option value='3x3'>3x3</option>
-            <option value='2x2'>2x2</option>
-            <option value='4x4'>4x4</option>
-            <option value='5x5'>5x5</option>
-            <option value='6x6'>6x6</option>
-            <option value='7x7'>7x7</option>
-            <option value='3x3 One-Handed'>3x3 One-Handed</option>
-            <option value='3x3 Blindfolded'>3x3 Blindfolded</option>
-            <option value='3x3 Multi-Blind'>3x3 Multi-Blind</option>
-            <option value='3x3 Fewest Moves'>3x3 Fewest Moves</option>
-            <option value='4x4 Blindfolded'>4x4 Blindfolded</option>
-            <option value='5x5 Blindfolded'>5x5 Blindfolded</option>
-            <option value='Pyraminx'>Pyraminx</option>
-            <option value='Megaminx'>Megaminx</option>
-            <option value='Square-1'>Square-1</option>
-            <option value='Skewb'>Skewb</option>
-            <option value="Rubik's Clock">Rubik's Clock</option>
+            {profile &&
+              profile.events.map(ev => (
+                <option value={ev.name}>{ev.name}</option>
+              ))}
           </select>
         </div>
         <div className='sidebar'>
           <div className='mbottom'>
             <h1 className='M'>Options</h1>
-            {solves.length !== 0 && (
+            {session.solves && session.solves.length !== 0 && (
               <Fragment>
                 <button
                   className='btn btn-light btn-small'
@@ -266,55 +224,46 @@ const Timer = ({
 
           <div>
             <h1 className='M'>Stats</h1>
-            {solves.length >= 3 && showMo3 && (cmo3 = average(3, true)) && (
+            {session.solves && session.solves.length >= 3 && showMo3 && (
               <Fragment>
-                <p>Current Mean of 3: {formatTime(cmo3)}</p>
-                <p>
-                  Best Mean of 3: {formatTime((bmo3 = Math.min(bmo3, cmo3)))}
-                </p>
+                <p>Current Mean 3: {formatTime(session.cmo3)}</p>
+                <p>Best Mean 3: {formatTime(session.bmo3)}</p>
                 <br />
               </Fragment>
             )}
-            {solves.length >= 5 && (cavg5 = average(5)) && (
+            {session.solves && session.solves.length >= 5 && (
               <Fragment>
-                <p>Current Avg 5: {formatTime(cavg5)}</p>
-                <p>
-                  Best Avg 5: {formatTime((bavg5 = Math.min(bavg5, cavg5)))}
-                </p>
+                <p>Current Avg 5: {formatTime(session.cavg5)}</p>
+                <p>Best Avg 5:{formatTime(session.bavg5)}</p>
                 <br />
               </Fragment>
             )}
-            {solves.length >= 12 && (cavg12 = average(12)) && (
+            {session.solves && session.solves.length >= 12 && (
               <Fragment>
-                <p>Current Avg 12: {formatTime(cavg12)}</p>
-                <p>
-                  Best Avg 12: {formatTime((bavg12 = Math.min(bavg12, cavg12)))}
-                </p>
+                <p>Current Avg 12: {formatTime(session.cavg12)}</p>
+                <p>Best Avg 12: {formatTime(session.bavg12)}</p>
                 <br />
               </Fragment>
             )}
-            {solves.length >= 50 && (cavg50 = average(50)) && (
+            {session.solves && session.solves.length >= 50 && (
               <Fragment>
-                <p>Current Avg 50: {formatTime(cavg50)}</p>
-                <p>
-                  Best Avg 50: {formatTime((bavg50 = Math.min(bavg50, cavg50)))}
-                </p>
+                <p>Current Avg 50: {formatTime(session.cavg50)}</p>
+                <p>Best Avg 50: {formatTime(session.bavg50)}</p>
                 <br />
               </Fragment>
             )}
-            {solves.length >= 100 && (cavg100 = average(100)) && (
+            {session.solves && session.solves.length >= 100 && (
               <Fragment>
-                <p>Current Avg 100: {formatTime(cavg100)}</p>
-                <p>
-                  Best Avg 100:{' '}
-                  {formatTime((bavg100 = Math.min(bavg100, cavg100)))}
-                </p>
+                <p>Current Avg 100: {formatTime(session.cavg100)}</p>
+                <p>Best Avg 100: {formatTime(session.bavg100)}</p>
                 <br />
               </Fragment>
             )}
-            {solves.length >= 1 && <p>Number of Solves: {solves.length}</p>}
-            {solves.length >= 1 && (
-              <p>Session Mean: {formatTime(average(solves.length))}</p>
+            {session.solves && session.solves.length >= 1 && (
+              <Fragment>
+                <p>Number of Solves: {session.numsolves}</p>
+                <p>Session Mean: {formatTime(session.mean)}</p>
+              </Fragment>
             )}
           </div>
         </div>
@@ -345,14 +294,15 @@ const Timer = ({
           </small>
           <br />
           <div className='scrollable'>
-            {solves.length > 0 ? (
-              solves.map(sol => (
+            {session.solves && session.solves.length > 0 ? (
+              session.solves.map(sol => (
                 <span
                   className='pointer-cursor'
-                  onClick={() => setDisplaySolve(solves.indexOf(sol))}
+                  onClick={() => setDisplaySolve(session.solves.indexOf(sol))}
                 >
                   {formatTime(sol.time)}
-                  {solves.indexOf(sol) !== solves.length - 1 && <span>, </span>}
+                  {session.solves.indexOf(sol) !==
+                    session.solves.length - 1 && <span>, </span>}
                 </span>
               ))
             ) : (
@@ -360,12 +310,12 @@ const Timer = ({
             )}
           </div>
           <div>
-            {solves.length > 0 && displaySolve >= 0 && (
+            {session.solves && session.solves.length > 0 && displaySolve >= 0 && (
               <Fragment>
                 <p className='S'>Solve Info</p>
                 <div className='scrollable'>
-                  <p>Time: {formatTime(solves[displaySolve].time)}</p>
-                  <p>Scramble: {solves[displaySolve].scramble}</p>
+                  <p>Time: {formatTime(session.solves[displaySolve].time)}</p>
+                  <p>Scramble: {session.solves[displaySolve].scramble}</p>
                   <button
                     className='btn btn-danger btn-small'
                     onClick={removeSolve}
@@ -388,11 +338,13 @@ Timer.propTypes = {
   clearSession: PropTypes.func.isRequired,
   addSolve: PropTypes.func.isRequired,
   deleteSolve: PropTypes.func.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
   solve: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = state => ({
   solve: state.solve,
+  profile: state.profile,
 });
 
 export default connect(mapStateToProps, {
@@ -401,4 +353,5 @@ export default connect(mapStateToProps, {
   clearSession,
   addSolve,
   deleteSolve,
+  getCurrentProfile,
 })(Timer);

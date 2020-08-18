@@ -3,6 +3,7 @@ const router = express.Router();
 const normalize = require('normalize-url');
 const auth = require('../../middleware/auth');
 const checkObjectId = require('../../middleware/checkObjectId');
+const average = require('../../utils/average');
 const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
@@ -104,6 +105,7 @@ router.post(
     profileFields.social = socialfields;
 
     try {
+      // this allows for both creating and updating profiles
       let profile = await Profile.findOneAndUpdate(
         { user: req.user.id },
         { $set: profileFields },
@@ -134,7 +136,7 @@ router.get('/solve/:event', auth, async (req, res) => {
     for (e in profile.events) {
       const ev = profile.events[e];
       if (ev.name === req.params.event) {
-        res.json(ev.solves[ev.solves.length - 1]);
+        res.json(ev.sessions[ev.sessions.length - 1]);
         break;
       }
     }
@@ -170,9 +172,112 @@ router.put(
       for (e in profile.events) {
         const ev = profile.events[e];
         if (ev.name === req.params.event) {
-          profile.events[e].solves[ev.solves.length - 1].push(newSolve);
+          profile.events[e].sessions[ev.sessions.length - 1].solves.push(
+            newSolve
+          );
+          const sols =
+            profile.events[e].sessions[ev.sessions.length - 1].solves;
+          const len = sols.length;
+          profile.events[e].sessions[ev.sessions.length - 1].numsolves = len;
+          profile.events[e].sessions[ev.sessions.length - 1].mean = average(
+            sols,
+            len,
+            true
+          );
+          if (len >= 3) {
+            profile.events[e].sessions[ev.sessions.length - 1].cmo3 = average(
+              sols,
+              3,
+              true
+            );
+            if (len == 3) {
+              profile.events[e].sessions[ev.sessions.length - 1].bmo3 = average(
+                sols,
+                3,
+                true
+              );
+            } else {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bmo3 = Math.min(
+                profile.events[e].sessions[ev.sessions.length - 1].bmo3,
+                profile.events[e].sessions[ev.sessions.length - 1].cmo3
+              );
+            }
+          }
+          if (len >= 5) {
+            profile.events[e].sessions[ev.sessions.length - 1].cavg5 = average(
+              sols,
+              5
+            );
+            if (len == 5) {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg5 = average(sols, 5);
+            } else {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg5 = Math.min(
+                profile.events[e].sessions[ev.sessions.length - 1].bavg5,
+                profile.events[e].sessions[ev.sessions.length - 1].cavg5
+              );
+            }
+          }
+          if (len >= 12) {
+            profile.events[e].sessions[ev.sessions.length - 1].cavg12 = average(
+              sols,
+              12
+            );
+            if (len == 12) {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg12 = average(sols, 12);
+            } else {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg12 = Math.min(
+                profile.events[e].sessions[ev.sessions.length - 1].bavg12,
+                profile.events[e].sessions[ev.sessions.length - 1].cavg12
+              );
+            }
+          }
+          if (len >= 50) {
+            profile.events[e].sessions[ev.sessions.length - 1].cavg50 = average(
+              sols,
+              50
+            );
+            if (len == 50) {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg50 = average(sols, 50);
+            } else {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg50 = Math.min(
+                profile.events[e].sessions[ev.sessions.length - 1].bavg50,
+                profile.events[e].sessions[ev.sessions.length - 1].cavg50
+              );
+            }
+          }
+          if (len >= 100) {
+            profile.events[e].sessions[
+              ev.sessions.length - 1
+            ].cavg100 = average(sols, 100);
+            if (len == 100) {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg100 = average(sols, 100);
+            } else {
+              profile.events[e].sessions[
+                ev.sessions.length - 1
+              ].bavg100 = Math.min(
+                profile.events[e].sessions[ev.sessions.length - 1].bavg100,
+                profile.events[e].sessions[ev.sessions.length - 1].cavg100
+              );
+            }
+          }
           await profile.save();
-          res.json(profile.events[e].solves[ev.solves.length - 1]);
+          res.json(profile.events[e].sessions[ev.sessions.length - 1]);
           break;
         }
       }
@@ -193,9 +298,9 @@ router.put('/session/:event', auth, async (req, res) => {
     for (e in profile.events) {
       const ev = profile.events[e];
       if (ev.name === req.params.event) {
-        profile.events[e].solves.push([]);
+        profile.events[e].sessions.push({});
         await profile.save();
-        return res.json(profile.events[e].solves[ev.solves.length - 1]);
+        return res.json(profile.events[e].sessions[ev.sessions.length - 1]);
       }
     }
   } catch (err) {
@@ -214,14 +319,14 @@ router.delete('/solve/:event/:id', auth, async (req, res) => {
     for (e in profile.events) {
       const ev = profile.events[e];
       if (ev.name === req.params.event) {
-        profile.events[e].solves[ev.solves.length - 1] = ev.solves[
-          ev.solves.length - 1
-        ].filter(sol => sol._id.toString() !== req.params.id);
+        profile.events[e].sessions[ev.sessions.length - 1].solves = ev.sessions[
+          ev.sessions.length - 1
+        ].solves.filter(sol => sol._id.toString() !== req.params.id);
         profile.markModified('events'); //this tells mongoose to look for changes in events array
         await profile.save(); // saves changes to mongoose
         return res
           .status(200)
-          .json(profile.events[e].solves[ev.solves.length - 1]);
+          .json(profile.events[e].sessions[ev.sessions.length - 1]);
       }
     }
   } catch (error) {
@@ -240,7 +345,7 @@ router.delete('/solve/:event/', auth, async (req, res) => {
     for (e in profile.events) {
       const ev = profile.events[e];
       if (ev.name === req.params.event) {
-        profile.events[e].solves[ev.solves.length - 1] = [];
+        profile.events[e].sessions[ev.sessions.length - 1].solves = [];
         profile.markModified('events'); //this tells mongoose to look for changes in events array
         await profile.save(); // saves changes to mongoose
         return res.status(200).json(profile.events);

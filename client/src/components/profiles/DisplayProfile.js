@@ -75,6 +75,44 @@ const DisplayProfile = ({
                 </p>
               )}
             </div>
+            <div>
+              {profile.social.youtube && (
+                <a
+                  href={profile.social.youtube}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <i className='fab fa-youtube fa-2x' />
+                </a>
+              )}
+              {profile.social.instagram && (
+                <a
+                  href={profile.social.instagram}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <i className='fab fa-instagram fa-2x' />
+                </a>
+              )}
+              {profile.social.twitter && (
+                <a
+                  href={profile.social.twitter}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <i className='fab fa-twitter fa-2x' />
+                </a>
+              )}
+              {profile.social.facebook && (
+                <a
+                  href={profile.social.facebook}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <i className='fab fa-facebook fa-2x' />
+                </a>
+              )}
+            </div>
           </div>
 
           {profile.events && <Events events={profile.events} />}

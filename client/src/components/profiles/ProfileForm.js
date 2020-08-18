@@ -27,10 +27,9 @@ const ProfileForm = ({
   getCurrentProfile,
   history,
 }) => {
+  // state
   const [formData, setFormData] = useState(initialState);
-
   const [displaySocialInputs, toggleSocialInputs] = useState(false);
-
   const [editEvent, setEditEvent] = useState(null);
 
   useEffect(() => {
@@ -58,6 +57,7 @@ const ProfileForm = ({
     instagram,
     name,
     single,
+    mo3,
     avg5,
     avg12,
     solves,
@@ -82,6 +82,7 @@ const ProfileForm = ({
       ...formData,
       name: '',
       single: '',
+      mo3: '',
       avg5: '',
       avg12: '',
     });
@@ -90,11 +91,13 @@ const ProfileForm = ({
   const addEvent = () => {
     if (name === null) return;
     const ev = {
-      name: name,
-      single: single,
-      avg5: avg5,
-      avg12: avg12,
-      solves: solves,
+      // if needed, change this back
+      name,
+      single,
+      mo3,
+      avg5,
+      avg12,
+      solves,
     };
     events.push(ev);
     setEditEvent(null);
@@ -109,6 +112,7 @@ const ProfileForm = ({
             ...formData,
             name: events[i].name,
             single: events[i].single,
+            mo3: events[i].mo3,
             avg5: events[i].avg5,
             avg12: events[i].avg12,
           });
@@ -116,6 +120,7 @@ const ProfileForm = ({
           let newEvents = events;
           newEvents[i].name = name;
           newEvents[i].single = single;
+          newEvents[i].mo3 = mo3;
           newEvents[i].avg5 = avg5;
           newEvents[i].avg12 = avg12;
           setFormData({
@@ -165,29 +170,49 @@ const ProfileForm = ({
       <div className='form-group'>
         <input
           type='text'
-          placeholder='Best Single'
+          placeholder='PB Single'
           name='single'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
           value={single}
           onChange={onChange}
         />
+        <small>Desired Format: HH:MM:SS.XX</small>
       </div>
       <div className='form-group'>
         <input
           type='text'
-          placeholder='Best Average of 5'
+          placeholder='PB Mean of 3'
+          name='mo3'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
+          value={mo3}
+          onChange={onChange}
+        />
+        <small>
+          This metric is only there for those few events like 6x6 and 7x7 where
+          the mean is tracked.
+        </small>
+      </div>
+      <div className='form-group'>
+        <input
+          type='text'
+          placeholder='PB Average of 5'
           name='avg5'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
           value={avg5}
           onChange={onChange}
         />
+        <small>Desired Format: HH:MM:SS.XX</small>
       </div>
       <div className='form-group'>
         <input
           type='text'
-          placeholder='Best Average of 12'
+          placeholder='PB Average of 12'
           name='avg12'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
           value={avg12}
           onChange={onChange}
         />
+        <small>Desired Format: HH:MM:SS.XX</small>
       </div>
 
       {editEvent !== 'new' && (
@@ -229,7 +254,7 @@ const ProfileForm = ({
             value={bio}
             onChange={onChange}
           />
-          <small className='form-text'>
+          <small>
             Feel free to include any general information about yourself. Keep it
             short!
           </small>
@@ -243,7 +268,7 @@ const ProfileForm = ({
             value={location}
             onChange={onChange}
           />
-          <small className='form-text'>
+          <small>
             Only provide your location if you feel comfortable with it and want
             to find cubers near you.
           </small>
@@ -257,7 +282,7 @@ const ProfileForm = ({
             value={wcaid}
             onChange={onChange}
           />
-          <small className='form-text'>
+          <small>
             Type your WCA ID, and a link to your WCA Profile will be showcased
             on your profile.
           </small>
@@ -280,6 +305,7 @@ const ProfileForm = ({
                 </div>
                 <div>
                   {event.single && <p className='S'>Single - {event.single}</p>}
+                  {event.mo3 && <p className='S'>Mean 3 - {event.mo3}</p>}
                   {event.avg5 && <p className='S'>Avg 5 - {event.avg5}</p>}
                   {event.avg12 && <p className='S'>Avg 12 - {event.avg12}</p>}
                 </div>
@@ -334,28 +360,6 @@ const ProfileForm = ({
         {displaySocialInputs && (
           <Fragment>
             <div className='form-group social-input'>
-              <i className='fab fa-twitter fa-2x' />
-              <input
-                type='text'
-                placeholder='Twitter URL'
-                name='twitter'
-                value={twitter}
-                onChange={onChange}
-              />
-            </div>
-
-            <div className='form-group social-input'>
-              <i className='fab fa-facebook fa-2x' />
-              <input
-                type='text'
-                placeholder='Facebook URL'
-                name='facebook'
-                value={facebook}
-                onChange={onChange}
-              />
-            </div>
-
-            <div className='form-group social-input'>
               <i className='fab fa-youtube fa-2x' />
               <input
                 type='text'
@@ -373,6 +377,28 @@ const ProfileForm = ({
                 placeholder='Instagram URL'
                 name='instagram'
                 value={instagram}
+                onChange={onChange}
+              />
+            </div>
+
+            <div className='form-group social-input'>
+              <i className='fab fa-twitter fa-2x' />
+              <input
+                type='text'
+                placeholder='Twitter URL'
+                name='twitter'
+                value={twitter}
+                onChange={onChange}
+              />
+            </div>
+
+            <div className='form-group social-input'>
+              <i className='fab fa-facebook fa-2x' />
+              <input
+                type='text'
+                placeholder='Facebook URL'
+                name='facebook'
+                value={facebook}
                 onChange={onChange}
               />
             </div>
