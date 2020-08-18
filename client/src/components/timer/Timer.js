@@ -1,12 +1,13 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
-import useKey from '../../utils/useKey';
+import useSpace from '../../utils/useKey';
 import {
   getSession,
   newSession,
   clearSession,
   addSolve,
+  deleteSolve,
 } from '../../actions/solve';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -16,17 +17,24 @@ const Timer = ({
   newSession,
   clearSession,
   addSolve,
+  deleteSolve,
   solve: { solves, loading },
 }) => {
+  // state
   const [event, setEvent] = useState('3x3');
   const [displaySolve, setDisplaySolve] = useState(solves.length - 1);
   const [scramble, setScramble] = useState('Loading...');
+  const [showMo3, toggleShowMo3] = useState(false);
   const [inspection, toggleInspection] = useState(false);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
   const [interv, setInterv] = useState();
-  const [status, setStatus] = useState('stopped');
+  const [status, setStatus] = useState('ready');
+
+  // variables for averages
   let bavg5 = Number.MAX_SAFE_INTEGER,
     cavg5 = Number.MAX_SAFE_INTEGER,
+    bmo3 = Number.MAX_SAFE_INTEGER,
+    cmo3 = Number.MAX_SAFE_INTEGER,
     bavg12 = Number.MAX_SAFE_INTEGER,
     cavg12 = Number.MAX_SAFE_INTEGER,
     bavg50 = Number.MAX_SAFE_INTEGER,
@@ -34,11 +42,13 @@ const Timer = ({
     bavg100 = Number.MAX_SAFE_INTEGER,
     cavg100 = Number.MAX_SAFE_INTEGER;
 
+  // variables for time
   var newcs = time.cs,
     news = time.s,
     newm = time.m,
     newh = time.h;
 
+  // timer functions
   const run = () => {
     if (newm === 60) {
       newh++;
@@ -75,29 +85,28 @@ const Timer = ({
     let t = 3600 * time.h + 60 * time.m + time.s + 0.01 * time.cs;
     t = Math.round(t * 100) / 100;
     addSolve(event, { time: t, scramble });
-    generateScramble();
   };
 
-  const generateScramble = () => {
+  const generateScramble = async () => {
     let ev = eventNaming[event];
     if (ev.slice(0, 3) === '333' && ev !== '333fm') ev = '333';
     if (ev.slice(0, 3) === '444') ev = '444';
     if (ev.slice(0, 3) === '555') ev = '555';
     const seeded_scramble = new Scrambow().setType(ev).get();
-    setScramble(seeded_scramble[0].scramble_string);
+    await setScramble(seeded_scramble[0].scramble_string);
   };
 
-  const changeEvent = async e => {
-    await setEvent(e.target.value);
-    generateScramble();
-    await setDisplaySolve(-1);
+  // handle pressing the spacebar
+  const handleUp = () => {
+    if (status === 'ready') start();
+    if (status === 'stopped') setStatus('ready');
   };
 
-  const handleSpace = () => {
-    if (status === 'stopped') start();
+  const handleDown = () => {
     if (status === 'started') stop();
   };
 
+  // general helpful functions
   const formatTime = num => {
     num = Math.round(100 * num) / 100;
     let h = Math.floor(num / 3600);
@@ -137,10 +146,20 @@ const Timer = ({
     return sum / divisor;
   };
 
+  // handling all options available to the user
+  const changeEvent = async e => {
+    await setEvent(e.target.value);
+    setDisplaySolve(-1);
+  };
+
+  const removeSolve = () => {
+    deleteSolve(event, solves[displaySolve]._id);
+    setDisplaySolve(displaySolve - 1);
+  };
+
   const clearSolves = async () => {
     await setDisplaySolve(-1);
     await clearSession(event);
-    await console.log(solves.length);
   };
 
   const getNewSession = async () => {
@@ -148,12 +167,12 @@ const Timer = ({
     await getSession(event);
   };
 
+  // functions to run when state changes
   useEffect(() => {
-    generateScramble();
     if (solves.length > 0) setDisplaySolve(solves.length - 1);
     else setDisplaySolve(-1);
-    console.log(displaySolve);
     getSession(event);
+    if (solves.length >= 5) cmo3 = average(3, true);
     if (solves.length >= 5) cavg5 = average(5);
     if (solves.length >= 12) cavg12 = average(12);
     if (solves.length >= 50) cavg50 = average(50);
@@ -164,9 +183,11 @@ const Timer = ({
   useEffect(() => {
     if (solves.length > 0) setDisplaySolve(solves.length - 1);
     else setDisplaySolve(-1);
+    generateScramble();
   }, [solves]);
 
-  useKey('Space', handleSpace);
+  useSpace('keyup', handleUp);
+  useSpace('keydown', handleDown);
 
   return (
     <Fragment>
@@ -235,39 +256,65 @@ const Timer = ({
             >
               Turn {inspection ? 'off' : 'on'} Inspection
             </button>
+            <button
+              className='btn btn-light btn-small'
+              onClick={() => toggleShowMo3(!showMo3)}
+            >
+              {showMo3 ? 'Hide' : 'Show'} Mean of 3
+            </button>
           </div>
+
           <div>
             <h1 className='M'>Stats</h1>
-            {solves.length >= 5 && (cavg5 = average(5)) && (
-              <p>Current Avg 5: {formatTime(cavg5)}</p>
+            {solves.length >= 3 && showMo3 && (cmo3 = average(3, true)) && (
+              <Fragment>
+                <p>Current Mean of 3: {formatTime(cmo3)}</p>
+                <p>
+                  Best Mean of 3: {formatTime((bmo3 = Math.min(bmo3, cmo3)))}
+                </p>
+                <br />
+              </Fragment>
             )}
-            {solves.length >= 5 && (
-              <p>Best Avg 5: {formatTime((bavg5 = Math.min(bavg5, cavg5)))}</p>
+            {solves.length >= 5 && (cavg5 = average(5)) && (
+              <Fragment>
+                <p>Current Avg 5: {formatTime(cavg5)}</p>
+                <p>
+                  Best Avg 5: {formatTime((bavg5 = Math.min(bavg5, cavg5)))}
+                </p>
+                <br />
+              </Fragment>
             )}
             {solves.length >= 12 && (cavg12 = average(12)) && (
-              <p>Current Avg 12: {formatTime(cavg12)}</p>
-            )}
-            {solves.length >= 12 && (
-              <p>
-                Best Avg 12: {formatTime((bavg12 = Math.min(bavg12, cavg12)))}
-              </p>
+              <Fragment>
+                <p>Current Avg 12: {formatTime(cavg12)}</p>
+                <p>
+                  Best Avg 12: {formatTime((bavg12 = Math.min(bavg12, cavg12)))}
+                </p>
+                <br />
+              </Fragment>
             )}
             {solves.length >= 50 && (cavg50 = average(50)) && (
-              <p>Current Avg 50: {formatTime(cavg50)}</p>
-            )}
-            {solves.length >= 50 && (
-              <p>
-                Best Avg 50: {formatTime((bavg50 = Math.min(bavg50, cavg50)))}
-              </p>
+              <Fragment>
+                <p>Current Avg 50: {formatTime(cavg50)}</p>
+                <p>
+                  Best Avg 50: {formatTime((bavg50 = Math.min(bavg50, cavg50)))}
+                </p>
+                <br />
+              </Fragment>
             )}
             {solves.length >= 100 && (cavg100 = average(100)) && (
-              <p>Current Avg 100: {formatTime(cavg100)}</p>
+              <Fragment>
+                <p>Current Avg 100: {formatTime(cavg100)}</p>
+                <p>
+                  Best Avg 100:{' '}
+                  {formatTime((bavg100 = Math.min(bavg100, cavg100)))}
+                </p>
+                <br />
+              </Fragment>
             )}
-            {solves.length >= 100 && (
-              <p>
-                Best Avg 100:{' '}
-                {formatTime((bavg100 = Math.min(bavg100, cavg100)))}
-              </p>
+            {solves.length >= 1 && <p>Number of Solves: {solves.length}</p>}
+            {solves.length >= 1 && (
+              <p>Session Mean: {formatTime(average(solves.length))}</p>
             )}
           </div>
         </div>
@@ -283,8 +330,11 @@ const Timer = ({
                 {time.m}:{time.s < 10 && '0'}
               </span>
             )}
-            {time.s}.{time.cs < 10 && '0'}
-            {time.cs}
+            {time.s}
+            <span className='centiseconds'>
+              .{time.cs < 10 && '0'}
+              {time.cs}
+            </span>
           </h1>
           <p>Scramble: {scramble}</p>
         </div>
@@ -301,7 +351,7 @@ const Timer = ({
                   className='pointer-cursor'
                   onClick={() => setDisplaySolve(solves.indexOf(sol))}
                 >
-                  {sol.time}
+                  {formatTime(sol.time)}
                   {solves.indexOf(sol) !== solves.length - 1 && <span>, </span>}
                 </span>
               ))
@@ -314,11 +364,11 @@ const Timer = ({
               <Fragment>
                 <p className='S'>Solve Info</p>
                 <div className='scrollable'>
-                  <p>Time: {solves[displaySolve].time}</p>
+                  <p>Time: {formatTime(solves[displaySolve].time)}</p>
                   <p>Scramble: {solves[displaySolve].scramble}</p>
                   <button
                     className='btn btn-danger btn-small'
-                    onClick={getSession}
+                    onClick={removeSolve}
                   >
                     Delete
                   </button>
@@ -337,6 +387,7 @@ Timer.propTypes = {
   newSession: PropTypes.func.isRequired,
   clearSession: PropTypes.func.isRequired,
   addSolve: PropTypes.func.isRequired,
+  deleteSolve: PropTypes.func.isRequired,
   solve: PropTypes.array.isRequired,
 };
 
@@ -349,4 +400,5 @@ export default connect(mapStateToProps, {
   newSession,
   clearSession,
   addSolve,
+  deleteSolve,
 })(Timer);

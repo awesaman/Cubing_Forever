@@ -22,6 +22,7 @@ export default function (state = initialState, action) {
         solves: payload,
         loading: false,
       };
+    case DELETE_SOLVE:
     case CLEAR_SOLVES:
       return {
         ...state,

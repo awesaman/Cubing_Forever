@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
-const useKey = (key, cb) => {
+const useSpace = (key, cb) => {
   const callbackRef = useRef(cb);
 
   useEffect(() => {
@@ -9,13 +9,14 @@ const useKey = (key, cb) => {
 
   useEffect(() => {
     const handle = e => {
-      if (e.code === key) {
+      if (e.code === 'Space') {
+        e.preventDefault();
         callbackRef.current(e);
       }
     };
-    document.addEventListener('keypress', handle);
-    return () => document.removeEventListener('keypress', handle);
+    document.addEventListener(key, handle);
+    return () => document.removeEventListener(key, handle);
   }, []);
 };
 
-export default useKey;
+export default useSpace;

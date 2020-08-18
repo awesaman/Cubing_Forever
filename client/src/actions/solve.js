@@ -80,3 +80,21 @@ export const clearSession = event => async dispatch => {
     });
   }
 };
+
+// Delete a solve
+export const deleteSolve = (event, id) => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.delete(`/profile/solve/${ev}/${id}`);
+
+    dispatch({
+      type: DELETE_SOLVE,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
