@@ -18,7 +18,7 @@ const initialState = {
   single: '',
   avg5: '',
   avg12: '',
-  solves: [[]],
+  sessions: [{ solves: [] }],
 };
 
 const ProfileForm = ({
@@ -60,7 +60,7 @@ const ProfileForm = ({
     mo3,
     avg5,
     avg12,
-    solves,
+    sessions,
   } = formData;
 
   const close = () => {
@@ -71,6 +71,14 @@ const ProfileForm = ({
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const onSubmit = e => {
+    e.preventDefault();
+    createProfile(formData, history, profile ? true : false);
+    if (editEvent === 'new') addEvent();
+    else if (editEvent !== null) modifyEvent(name);
+    close();
+  };
+
+  const onSubmitEvent = e => {
     e.preventDefault();
     createProfile(formData, history, profile ? true : false);
     close();
@@ -91,13 +99,12 @@ const ProfileForm = ({
   const addEvent = () => {
     if (name === null) return;
     const ev = {
-      // if needed, change this back
       name,
       single,
       mo3,
       avg5,
       avg12,
-      solves,
+      sessions,
     };
     events.push(ev);
     setEditEvent(null);
@@ -127,7 +134,6 @@ const ProfileForm = ({
             ...formData,
             events: newEvents,
           });
-          close();
         }
         break;
       }
@@ -215,27 +221,29 @@ const ProfileForm = ({
         <small>Desired Format: HH:MM:SS.XX</small>
       </div>
 
-      {editEvent !== 'new' && (
-        <div className='buttons'>
-          <button
-            onClick={() => modifyEvent(name)}
-            type='button'
-            className='btn btn-success'
-          >
-            Done
+      <div className='buttons'>
+        {editEvent !== 'new' ? (
+          <Fragment>
+            <button type='submit' className='btn btn-success'>
+              Save Changes
+            </button>
+            <button
+              onClick={() => removeEvent(name)}
+              type='button'
+              className='btn btn-danger'
+            >
+              Remove Event
+            </button>
+          </Fragment>
+        ) : (
+          <button type='submit' className='btn btn-success'>
+            Save Event
           </button>
-          <button
-            onClick={() => removeEvent(name)}
-            type='button'
-            className='btn btn-danger'
-          >
-            Remove Event
-          </button>
-          <button onClick={close} type='button' className='btn btn-light'>
-            Close
-          </button>
-        </div>
-      )}
+        )}
+        <button onClick={close} type='button' className='btn btn-light'>
+          Close
+        </button>
+      </div>
     </Fragment>
   );
 
@@ -323,23 +331,15 @@ const ProfileForm = ({
               {editEvent === event.name && eventForm}
             </Fragment>
           ))}
-        {editEvent === 'new' && eventForm}
         {editEvent === 'new' ? (
-          <div className='buttons'>
-            <button
-              onClick={addEvent}
-              type='button'
-              className='btn btn-success'
-            >
-              Event Info Complete
-            </button>
-            <button onClick={close} type='button' className='btn btn-light'>
-              Close
-            </button>
-          </div>
+          eventForm
         ) : (
           <div className='buttons'>
-            <button onClick={openNew} type='button' className='btn btn-primary'>
+            <button
+              onMouseUp={openNew}
+              type='button'
+              className='btn btn-primary'
+            >
               Add Event
             </button>
             <span> *Events are required</span>
@@ -352,7 +352,7 @@ const ProfileForm = ({
             type='button'
             className='btn btn-light'
           >
-            Add Social Links
+            {displaySocialInputs ? 'Hide' : 'Add'} Social Links
           </button>
           <span>Optional</span>
         </div>

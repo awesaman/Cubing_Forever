@@ -7,7 +7,9 @@ import {
   newSession,
   clearSession,
   addSolve,
+  addPenalty,
   deleteSolve,
+  updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
 import PropTypes from 'prop-types';
@@ -18,7 +20,9 @@ const Timer = ({
   newSession,
   clearSession,
   addSolve,
+  addPenalty,
   deleteSolve,
+  updateStats,
   getCurrentProfile,
   profile: { profile },
   solve: { session, loading },
@@ -70,12 +74,13 @@ const Timer = ({
     setInterv(setInterval(run, 10));
   };
 
-  const stop = () => {
+  const stop = async () => {
     clearInterval(interv);
     setStatus('stopped');
     let t = 3600 * time.h + 60 * time.m + time.s + 0.01 * time.cs;
-    t = Math.round(t * 100) / 100;
-    addSolve(event, { time: t, scramble });
+    t = Math.floor(t * 100) / 100;
+    await addSolve(event, { time: t, scramble });
+    await updateStats(event);
   };
 
   const generateScramble = async () => {
@@ -98,8 +103,9 @@ const Timer = ({
   };
 
   // general helpful functions
-  const formatTime = num => {
-    num = Math.round(100 * num) / 100;
+  const formatTime = (num, penalty = null) => {
+    if (typeof num !== 'number') return num;
+    num = Math.floor(100 * num) / 100;
     let h = Math.floor(num / 3600);
     let m = Math.floor((num - h * 60) / 60);
     let s = Math.floor(num - 3600 * h - m * 60);
@@ -117,8 +123,13 @@ const Timer = ({
     if (s > 0) {
       result = result.concat(s, '.');
       if (cs < 10) result = result.concat('0');
-    } else result = result.concat('0.');
+    } else {
+      result = result.concat('0.');
+      if (cs < 10) result = result.concat('0');
+    }
     result = result.concat(cs);
+    if (penalty === '+2') result = result.concat('+');
+    if (penalty === 'DNF') result = result.concat(' DNF');
     return result;
   };
 
@@ -131,6 +142,17 @@ const Timer = ({
   const removeSolve = () => {
     deleteSolve(event, session.solves[displaySolve]._id);
     setDisplaySolve(displaySolve - 1);
+    updateStats(event);
+  };
+
+  const plus2 = async () => {
+    await addPenalty(event, session.solves[displaySolve]._id, '+2');
+    await updateStats(event);
+  };
+
+  const dnf = async () => {
+    await addPenalty(event, session.solves[displaySolve]._id, 'DNF');
+    await updateStats(event);
   };
 
   const clearSolves = async () => {
@@ -226,36 +248,66 @@ const Timer = ({
             <h1 className='M'>Stats</h1>
             {session.solves && session.solves.length >= 3 && showMo3 && (
               <Fragment>
-                <p>Current Mean 3: {formatTime(session.cmo3)}</p>
-                <p>Best Mean 3: {formatTime(session.bmo3)}</p>
+                <p>
+                  Current Mean 3:{' '}
+                  <span className='S'>{formatTime(session.cmo3)}</span>
+                </p>
+                <p>
+                  Best Mean 3:{' '}
+                  <span className='S'>{formatTime(session.bmo3)}</span>
+                </p>
                 <br />
               </Fragment>
             )}
             {session.solves && session.solves.length >= 5 && (
               <Fragment>
-                <p>Current Avg 5: {formatTime(session.cavg5)}</p>
-                <p>Best Avg 5:{formatTime(session.bavg5)}</p>
+                <p>
+                  Current Avg 5:{' '}
+                  <span className='S'>{formatTime(session.cavg5)}</span>
+                </p>
+                <p>
+                  {'('}Best Avg 5{'): '}
+                  <span className='S'>{formatTime(session.bavg5)}</span>
+                </p>
                 <br />
               </Fragment>
             )}
             {session.solves && session.solves.length >= 12 && (
               <Fragment>
-                <p>Current Avg 12: {formatTime(session.cavg12)}</p>
-                <p>Best Avg 12: {formatTime(session.bavg12)}</p>
+                <p>
+                  Current Avg 12:{' '}
+                  <span className='S'>{formatTime(session.cavg12)}</span>
+                </p>
+                <p>
+                  {'['}Best Avg 12{']: '}
+                  <span className='S'>{formatTime(session.bavg12)}</span>
+                </p>
                 <br />
               </Fragment>
             )}
             {session.solves && session.solves.length >= 50 && (
               <Fragment>
-                <p>Current Avg 50: {formatTime(session.cavg50)}</p>
-                <p>Best Avg 50: {formatTime(session.bavg50)}</p>
+                <p>
+                  Current Avg 50:{' '}
+                  <span className='S'>{formatTime(session.cavg50)}</span>
+                </p>
+                <p>
+                  {'{'}Best Avg 50{'}: '}
+                  <span className='S'>{formatTime(session.bavg50)}</span>
+                </p>
                 <br />
               </Fragment>
             )}
             {session.solves && session.solves.length >= 100 && (
               <Fragment>
-                <p>Current Avg 100: {formatTime(session.cavg100)}</p>
-                <p>Best Avg 100: {formatTime(session.bavg100)}</p>
+                <p>
+                  Current Avg 100:{' '}
+                  <span className='S'>{formatTime(session.cavg100)}</span>
+                </p>
+                <p>
+                  {'<'}Best Avg 100{'>: '}
+                  <span className='S'>{formatTime(session.bavg100)}</span>
+                </p>
                 <br />
               </Fragment>
             )}
@@ -263,6 +315,8 @@ const Timer = ({
               <Fragment>
                 <p>Number of Solves: {session.numsolves}</p>
                 <p>Session Mean: {formatTime(session.mean)}</p>
+                <p>Best Solve: {formatTime(session.best)}</p>
+                <p>Worst Solve: {formatTime(session.worst)}</p>
               </Fragment>
             )}
           </div>
@@ -293,16 +347,29 @@ const Timer = ({
             (click on a solve to reveal info about it)
           </small>
           <br />
-          <div className='scrollable'>
+          <div className='mbottom'>
             {session.solves && session.solves.length > 0 ? (
               session.solves.map(sol => (
                 <span
                   className='pointer-cursor'
                   onClick={() => setDisplaySolve(session.solves.indexOf(sol))}
                 >
-                  {formatTime(sol.time)}
-                  {session.solves.indexOf(sol) !==
-                    session.solves.length - 1 && <span>, </span>}
+                  {session.solves.indexOf(sol) === session.bavg100loc && '<'}
+                  {session.solves.indexOf(sol) === session.bavg50loc && '{'}
+                  {session.solves.indexOf(sol) === session.bavg12loc && '['}
+                  {session.solves.indexOf(sol) === session.bavg5loc && '('}
+                  {sol.penalty
+                    ? formatTime(sol.time, sol.penalty)
+                    : formatTime(sol.time)}
+                  {session.solves.indexOf(sol) === session.bavg5loc + 4 && ')'}
+                  {session.solves.indexOf(sol) === session.bavg12loc + 11 &&
+                    ']'}
+                  {session.solves.indexOf(sol) === session.bavg50loc + 49 &&
+                    '}'}
+                  {session.solves.indexOf(sol) === session.bavg100loc + 99 &&
+                    '>'}
+                  {session.solves.indexOf(sol) !== session.solves.length - 1 &&
+                    ', '}
                 </span>
               ))
             ) : (
@@ -313,15 +380,41 @@ const Timer = ({
             {session.solves && session.solves.length > 0 && displaySolve >= 0 && (
               <Fragment>
                 <p className='S'>Solve Info</p>
-                <div className='scrollable'>
+                <div>
                   <p>Time: {formatTime(session.solves[displaySolve].time)}</p>
+                  {session.solves[displaySolve].penalty && (
+                    <p>Penalty: {session.solves[displaySolve].penalty}</p>
+                  )}
+                  <p>
+                    Solve: {displaySolve + 1}/{session.numsolves}
+                  </p>
                   <p>Scramble: {session.solves[displaySolve].scramble}</p>
-                  <button
-                    className='btn btn-danger btn-small'
-                    onClick={removeSolve}
-                  >
-                    Delete
-                  </button>
+                  <div className='buttons'>
+                    <button
+                      className='btn btn-danger btn-small'
+                      onClick={removeSolve}
+                    >
+                      Delete
+                    </button>
+                    {session.solves[displaySolve].penalty !== 'DNF' && (
+                      <Fragment>
+                        {session.solves[displaySolve].penalty !== '+2' && (
+                          <button
+                            className='btn btn-light btn-small'
+                            onClick={plus2}
+                          >
+                            +2
+                          </button>
+                        )}
+                        <button
+                          className='btn btn-light btn-small'
+                          onClick={dnf}
+                        >
+                          DNF
+                        </button>
+                      </Fragment>
+                    )}
+                  </div>
                 </div>
               </Fragment>
             )}
@@ -337,7 +430,9 @@ Timer.propTypes = {
   newSession: PropTypes.func.isRequired,
   clearSession: PropTypes.func.isRequired,
   addSolve: PropTypes.func.isRequired,
+  addPenalty: PropTypes.func.isRequired,
   deleteSolve: PropTypes.func.isRequired,
+  updateStats: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   solve: PropTypes.array.isRequired,
 };
@@ -352,6 +447,8 @@ export default connect(mapStateToProps, {
   newSession,
   clearSession,
   addSolve,
+  addPenalty,
   deleteSolve,
+  updateStats,
   getCurrentProfile,
 })(Timer);

@@ -7,6 +7,8 @@ import {
   ADD_SOLVE,
   ADD_SESSION,
   DELETE_SOLVE,
+  UPDATE_STATS,
+  ADD_PENALTY,
 } from './types';
 
 // Get last session
@@ -53,6 +55,42 @@ export const newSession = event => async dispatch => {
 
     dispatch({
       type: ADD_SESSION,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Update Stats
+export const updateStats = event => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.put(`/profile/stats/${ev}`);
+
+    dispatch({
+      type: UPDATE_STATS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Add a penalty to a solve
+export const addPenalty = (event, id, penalty) => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.put(`/profile/solve/${penalty}/${ev}/${id}`);
+
+    dispatch({
+      type: ADD_PENALTY,
       payload: res.data,
     });
   } catch (err) {

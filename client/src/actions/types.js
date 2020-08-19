@@ -17,4 +17,6 @@ export const CLEAR_SOLVES = 'CLEAR_SOLVES';
 export const ADD_SOLVE = 'ADD_SOLVE';
 export const DELETE_SOLVE = 'DELETE_SOLVE';
 export const ADD_SESSION = 'ADD_SESSION';
+export const ADD_PENALTY = 'ADD_PENALTY';
+export const UPDATE_STATS = 'UPDATE_STATS';
 export const SOLVE_ERROR = 'SOLVE_ERROR';

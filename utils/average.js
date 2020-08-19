@@ -1,12 +1,21 @@
 const average = (solves, range, mean = false) => {
-  let sum = 0,
-    i = solves.length - range;
+  let sum = 0;
+  let i = solves.length - range;
+  let seenDNF = false;
   let best = solves[i].time,
     worst = solves[i].time;
-  for (i = solves.length - range; i < solves.length; i += 1) {
+  for (i = solves.length - range; i < solves.length; i++) {
     sum += solves[i].time;
     best = Math.min(solves[i].time, best);
-    worst = Math.max(solves[i].time, worst);
+    if (!seenDNF) worst = Math.max(solves[i].time, worst);
+    if (solves[i].penalty === 'DNF') {
+      if (seenDNF && !mean) {
+        return 'DNF';
+      } else {
+        worst = solves[i].time;
+        seenDNF = true;
+      }
+    }
   }
   if (!mean) sum -= worst + best;
   let divisor = mean ? range : range - 2;

@@ -4,6 +4,8 @@ import {
   SOLVE_ERROR,
   ADD_SOLVE,
   DELETE_SOLVE,
+  UPDATE_STATS,
+  ADD_PENALTY,
 } from '../actions/types';
 
 const initialState = {
@@ -17,6 +19,8 @@ export default function (state = initialState, action) {
   switch (type) {
     case GET_SOLVES:
     case ADD_SOLVE:
+    case ADD_PENALTY:
+    case UPDATE_STATS:
       return {
         ...state,
         session: payload,
