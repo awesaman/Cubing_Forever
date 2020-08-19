@@ -34,8 +34,10 @@ const Timer = ({
   const [showMo3, toggleShowMo3] = useState(false);
   const [inspection, toggleInspection] = useState(false);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
-  const [interv, setInterv] = useState();
+  const [repeater, setRepeater] = useState();
+  const [penalty, setPenalty] = useState('');
   const [status, setStatus] = useState('ready');
+  const [green, setGreen] = useState(false);
 
   // variables for time
   var newcs = time.cs,
@@ -61,21 +63,43 @@ const Timer = ({
     return setTime({ cs: newcs, s: news, m: newm, h: newh });
   };
 
+  const runInspection = () => {
+    news--;
+    if (news < -1) {
+      setStatus('DNF');
+      setPenalty('DNF');
+    }
+    if (news === 0 || news === -1) {
+      setStatus('+2');
+      setPenalty('+2');
+    }
+    return setTime({ ...time, s: news });
+  };
+
   const reset = () => {
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
-    clearInterval(interv);
+    clearInterval(repeater);
+    // setPenalty('');
     newcs = news = newm = newh = 0;
+  };
+
+  const inspect = () => {
+    reset();
+    setTime({ ...time, s: 15 });
+    news = 15;
+    setStatus('inspecting');
+    setRepeater(setInterval(runInspection, 1000));
   };
 
   const start = () => {
     reset();
     setStatus('started');
     run();
-    setInterv(setInterval(run, 10));
+    setRepeater(setInterval(run, 10));
   };
 
   const stop = async () => {
-    clearInterval(interv);
+    clearInterval(repeater);
     setStatus('stopped');
     let t = 3600 * time.h + 60 * time.m + time.s + 0.01 * time.cs;
     t = Math.floor(t * 100) / 100;
@@ -94,12 +118,15 @@ const Timer = ({
 
   // handle pressing the spacebar
   const handleUp = () => {
-    if (status === 'ready') start();
+    if (status === 'ready') inspection ? inspect() : start();
+    if (status === 'inspecting' || status === '+2' || status === 'DNF') start();
     if (status === 'stopped') setStatus('ready');
+    setGreen(false);
   };
 
   const handleDown = () => {
     if (status === 'started') stop();
+    else setGreen(true);
   };
 
   // general helpful functions
@@ -177,7 +204,15 @@ const Timer = ({
       setDisplaySolve(session.solves.length - 1);
     else setDisplaySolve(-1);
     generateScramble();
+    if (penalty !== '')
+      addPenalty(event, session.solves[session.solves.length - 1]._id, penalty);
+    setPenalty('');
   }, [session.solves]);
+
+  useEffect(() => {
+    if (status === '+2') setPenalty('+2');
+    if (status === 'DNF') setPenalty('DNF');
+  }, [status]);
 
   useSpace('keyup', handleUp);
   useSpace('keydown', handleDown);
@@ -322,23 +357,32 @@ const Timer = ({
           </div>
         </div>
         <div>
-          <h1 className='XL'>
-            {time.h > 0 && (
-              <span>
-                {time.h}:{time.m < 10 && '0'}
+          {(status === 'stopped' ||
+            status === 'started' ||
+            status === 'ready') && (
+            <h1 className={green ? 'XL green' : 'XL'}>
+              {time.h > 0 && (
+                <span>
+                  {time.h}:{time.m < 10 && '0'}
+                </span>
+              )}
+              {time.m > 0 && (
+                <span>
+                  {time.m}:{time.s < 10 && '0'}
+                </span>
+              )}
+              {time.s}
+              <span className='centiseconds'>
+                .{time.cs < 10 && '0'}
+                {time.cs}
               </span>
-            )}
-            {time.m > 0 && (
-              <span>
-                {time.m}:{time.s < 10 && '0'}
-              </span>
-            )}
-            {time.s}
-            <span className='centiseconds'>
-              .{time.cs < 10 && '0'}
-              {time.cs}
-            </span>
-          </h1>
+            </h1>
+          )}
+          {status === 'inspecting' && (
+            <h1 className={green ? 'XL green' : 'XL'}>{time.s}</h1>
+          )}
+          {status === '+2' && <h1 className='XL red'>+2</h1>}
+          {status === 'DNF' && <h1 className='XL red'>DNF</h1>}
           <p>Scramble: {scramble}</p>
         </div>
         <div className='solves'>

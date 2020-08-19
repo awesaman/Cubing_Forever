@@ -335,12 +335,21 @@ router.put('/stats/:event', auth, async (req, res) => {
                 profile.events[e].sessions[ev.sessions.length - 1].cavg50 !==
                 'DNF'
               ) {
-                profile.events[e].sessions[
-                  ev.sessions.length - 1
-                ].bavg50 = Math.min(
-                  profile.events[e].sessions[ev.sessions.length - 1].bavg50,
-                  profile.events[e].sessions[ev.sessions.length - 1].cavg50
-                );
+                if (
+                  profile.events[e].sessions[ev.sessions.length - 1].bavg50 ===
+                  null
+                ) {
+                  profile.events[e].sessions[
+                    ev.sessions.length - 1
+                  ].bavg50 = average(s, 50);
+                } else {
+                  profile.events[e].sessions[
+                    ev.sessions.length - 1
+                  ].bavg50 = Math.min(
+                    profile.events[e].sessions[ev.sessions.length - 1].bavg50,
+                    profile.events[e].sessions[ev.sessions.length - 1].cavg50
+                  );
+                }
               }
               if (
                 profile.events[e].sessions[ev.sessions.length - 1].bavg50 ===
@@ -364,12 +373,21 @@ router.put('/stats/:event', auth, async (req, res) => {
                 profile.events[e].sessions[ev.sessions.length - 1].cavg100 !==
                 'DNF'
               ) {
-                profile.events[e].sessions[
-                  ev.sessions.length - 1
-                ].bavg100 = Math.min(
-                  profile.events[e].sessions[ev.sessions.length - 1].bavg100,
-                  profile.events[e].sessions[ev.sessions.length - 1].cavg100
-                );
+                if (
+                  profile.events[e].sessions[ev.sessions.length - 1].bavg100 ===
+                  null
+                ) {
+                  profile.events[e].sessions[
+                    ev.sessions.length - 1
+                  ].bavg100 = average(s, 100);
+                } else {
+                  profile.events[e].sessions[
+                    ev.sessions.length - 1
+                  ].bavg100 = Math.min(
+                    profile.events[e].sessions[ev.sessions.length - 1].bavg100,
+                    profile.events[e].sessions[ev.sessions.length - 1].cavg100
+                  );
+                }
               }
               if (
                 profile.events[e].sessions[ev.sessions.length - 1].bavg100 ===
