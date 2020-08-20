@@ -7,7 +7,7 @@ let socket = io('http://localhost:5000');
 let chatbox;
 let store = [];
 
-const Chat = ({ auth: { user } }) => {
+const Chat = ({ room, auth: { user } }) => {
   const [message, setMessage] = useState('');
   const [chats, setChats] = useState([]);
 
@@ -23,17 +23,38 @@ const Chat = ({ auth: { user } }) => {
     let avatar = user.avatar;
     let timestamp = moment().format('hh:mm a');
 
-    socket.emit('chat message', {
+    socket.emit('input message', room.roomID, {
       text,
       avatar,
       username,
       timestamp,
     });
+    setChats([
+      ...store,
+      {
+        text,
+        avatar,
+        username,
+        timestamp,
+      },
+    ]);
+    console.log('attempting to send');
     setMessage('');
   };
 
   useEffect(() => {
-    socket.on('chat message', msg => {
+    if (room.roomID === '') {
+      let url = window.location.href.split('/');
+      console.log(url[url.length - 1]);
+      room.roomID = url[url.length - 1];
+    }
+    console.log('but other things are happening');
+    socket.emit('join room', room.roomID, user.username);
+    socket.on('user connected', username => {
+      console.log(username + ' connected');
+    });
+    socket.on('output message', msg => {
+      console.log('msg.text');
       setChats([...store, msg]);
     });
   }, []);
@@ -85,10 +106,13 @@ const Chat = ({ auth: { user } }) => {
 };
 
 Chat.propTypes = {
+  room: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired,
 };
+
 const mapStateToProps = state => {
   return {
+    room: state.room,
     auth: state.auth,
   };
 };

@@ -22,3 +22,5 @@ export const UPDATE_STATS = 'UPDATE_STATS';
 export const SOLVE_ERROR = 'SOLVE_ERROR';
 export const SEND_MESSAGE = 'SEND_MESSAGE';
 export const CHAT_ERROR = 'CHAT_ERROR';
+export const ROOM_ERROR = 'ROOM_ERROR';
+export const CREATE_ROOM = 'CREATE_ROOM';

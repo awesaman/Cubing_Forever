@@ -17,9 +17,13 @@ app.use('/api/profile', require('./routes/api/profile'));
 
 // Socket Connection
 io.on('connection', socket => {
-  console.log('user connected');
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
+  socket.on('join room', (roomID, username) => {
+    socket.join(roomID);
+    socket.to(roomID).emit('user connected', username);
+  });
+  socket.on('input message', (roomID, msg) => {
+    socket.to(roomID).emit('output message', msg);
+    console.log('listened');
   });
 });
 

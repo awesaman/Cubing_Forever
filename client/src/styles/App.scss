@@ -443,8 +443,7 @@ button {
 }
 
 .gray {
-  // color: rgba(255, 255, 255, 0.4);
-  color: $gray-color;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .green {
@@ -474,6 +473,7 @@ button {
   display: inline-block;
   border-radius: 5px;
   height: 40px;
+  padding: 0 1em;
 }
 
 .mobile,
