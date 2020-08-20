@@ -20,3 +20,5 @@ export const ADD_SESSION = 'ADD_SESSION';
 export const ADD_PENALTY = 'ADD_PENALTY';
 export const UPDATE_STATS = 'UPDATE_STATS';
 export const SOLVE_ERROR = 'SOLVE_ERROR';
+export const SEND_MESSAGE = 'SEND_MESSAGE';
+export const CHAT_ERROR = 'CHAT_ERROR';

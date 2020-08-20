@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const connectDB = require('./config/db');
 const cors = require('cors');
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, { wsEngine: 'ws' });
 
 connectDB();
 
@@ -13,5 +15,13 @@ app.use('/api/user', require('./routes/api/user'));
 app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/profile', require('./routes/api/profile'));
 
+// Socket Connection
+io.on('connection', socket => {
+  console.log('user connected');
+  socket.on('chat message', msg => {
+    io.emit('chat message', msg);
+  });
+});
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

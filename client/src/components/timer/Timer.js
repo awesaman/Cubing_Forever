@@ -12,6 +12,7 @@ import {
   updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
+import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -236,7 +237,9 @@ const Timer = ({
           >
             {profile &&
               profile.events.map(ev => (
-                <option value={ev.name}>{ev.name}</option>
+                <option key={ev._id} value={ev.name}>
+                  {ev.name}
+                </option>
               ))}
           </select>
         </div>
@@ -395,6 +398,7 @@ const Timer = ({
             {session.solves && session.solves.length > 0 ? (
               session.solves.map(sol => (
                 <span
+                  key='sol._id'
                   className='pointer-cursor'
                   onClick={() => setDisplaySolve(session.solves.indexOf(sol))}
                 >
@@ -465,6 +469,7 @@ const Timer = ({
           </div>
         </div>
       </div>
+      <Chat />
     </Fragment>
   );
 };
@@ -478,7 +483,8 @@ Timer.propTypes = {
   deleteSolve: PropTypes.func.isRequired,
   updateStats: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
-  solve: PropTypes.array.isRequired,
+  solve: PropTypes.object.isRequired,
+  profile: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({

@@ -10,13 +10,14 @@ const useSpace = (key, cb) => {
   useEffect(() => {
     const handle = e => {
       if (
-        e.code === 'Space' ||
-        e.code === 'KeyX' ||
-        e.code === 'KeyC' ||
-        e.code === 'KeyV' ||
-        e.code === 'KeyB' ||
-        e.code === 'KeyN' ||
-        e.code === 'KeyM'
+        (e.code === 'Space' ||
+          e.code === 'KeyX' ||
+          e.code === 'KeyC' ||
+          e.code === 'KeyV' ||
+          e.code === 'KeyB' ||
+          e.code === 'KeyN' ||
+          e.code === 'KeyM') &&
+        document.activeElement.nodeName.toLowerCase() !== 'input'
       ) {
         e.preventDefault();
         callbackRef.current(e);

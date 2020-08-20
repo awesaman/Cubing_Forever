@@ -23,6 +23,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.26",
     "request": "^2.88.2",
+    "socket.io": "^2.3.0",
     "typescript": "^3.9.7",
     "uuid": "^8.3.0"
   },

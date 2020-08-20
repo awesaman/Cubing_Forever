@@ -393,7 +393,8 @@ button {
 }
 
 .scrollable {
-  height: 100px;
+  height: 200px;
+  width: stretch;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -418,6 +419,15 @@ button {
   margin: 0;
 }
 
+.chat-image {
+  display: inline-block;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  margin: 0;
+  margin-right: 1em;
+}
+
 .btn-small {
   font-size: 1em;
   margin: 0.5em 0.5em;
@@ -431,8 +441,37 @@ button {
   color: $danger-color;
 }
 
+.gray {
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .green {
   color: $success-color;
+}
+
+.chat {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.message-box {
+  display: flex;
+  height: 70px;
+  align-items: center;
+}
+
+.message-input {
+  display: inline-block;
+  width: 80%;
+  height: 50px;
+}
+
+.send {
+  justify-content: flex-end;
+  display: inline-block;
+  border-radius: 5px;
+  height: 40px;
 }
 
 .mobile,
