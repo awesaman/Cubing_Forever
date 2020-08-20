@@ -16,7 +16,7 @@ import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-const Timer = ({
+const CompeteTimer = ({
   getSession,
   newSession,
   clearSession,
@@ -469,11 +469,12 @@ const Timer = ({
           </div>
         </div>
       </div>
+      <Chat />
     </Fragment>
   );
 };
 
-Timer.propTypes = {
+CompeteTimer.propTypes = {
   getSession: PropTypes.func.isRequired,
   newSession: PropTypes.func.isRequired,
   clearSession: PropTypes.func.isRequired,
@@ -500,4 +501,4 @@ export default connect(mapStateToProps, {
   deleteSolve,
   updateStats,
   getCurrentProfile,
-})(Timer);
+})(CompeteTimer);

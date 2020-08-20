@@ -21,11 +21,6 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
         </Link>
       </li>
       <li>
-        <Link className='link' to='/timer' onClick={() => setOpen(!open)}>
-          Timer
-        </Link>
-      </li>
-      <li>
         <Link className='link' to='/login' onClick={() => setOpen(!open)}>
           Login
         </Link>
@@ -45,11 +40,11 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
           Timer
         </Link>
       </li>
-      {/* <li>
-        <Link className='link' to='/trainer' onClick={() => setOpen(!open)}>
-          Trainer
+      <li>
+        <Link className='link' to='/compete' onClick={() => setOpen(!open)}>
+          Compete
         </Link>
-      </li> */}
+      </li>
       <li>
         <Link className='link' to='/profiles' onClick={() => setOpen(!open)}>
           Cubers
@@ -81,9 +76,12 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
         </div>
         <div className='mobile'>
           <a
-            href='javascript:;'
+            href='#'
             className='L hamburger'
-            onClick={() => setOpen(!open)}
+            onClick={e => {
+              e.preventDefault();
+              setOpen(!open);
+            }}
           >
             <i className={open ? 'fas fa-times' : 'fas fa-bars'} />
           </a>

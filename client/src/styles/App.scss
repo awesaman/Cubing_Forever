@@ -2,10 +2,11 @@
 
 $primary-color: #3ab2f2;
 $dark-color: #2d3237;
+$gray-color: #4b4b4b;
 $light-color: #f4f4f4;
 $danger-color: #d72a3b;
 $success-color: #1dd247;
-$tablet-breakpoint: 1000px;
+$tablet-breakpoint: 1068px;
 $mobile-breakpoint: 738px;
 
 /* defaults */
@@ -353,7 +354,7 @@ button {
   padding: 1em 1em;
   line-height: 1.8;
   margin: 2em 0;
-  background-color: #4b4b4b;
+  background-color: $gray-color;
   border-radius: 15px;
   overflow: wrap;
 }
@@ -442,7 +443,8 @@ button {
 }
 
 .gray {
-  color: rgba(255, 255, 255, 0.4);
+  // color: rgba(255, 255, 255, 0.4);
+  color: $gray-color;
 }
 
 .green {
