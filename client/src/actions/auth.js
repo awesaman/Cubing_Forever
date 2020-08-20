@@ -37,12 +37,14 @@ export const register = formData => async dispatch => {
       type: REGISTER_SUCCESS,
       payload: res.data,
     });
+
+    // if it was a success, token is stored
+    localStorage.setItem('token', res.data.token);
     dispatch(loadUser());
   } catch (err) {
     const errors = err.response.data.errors;
     if (errors) {
       errors.forEach(error => dispatch(showAlert(error.msg, 'danger')));
-      console.log('reached');
     }
 
     dispatch({
@@ -63,7 +65,7 @@ export const login = (email, password) => async dispatch => {
       payload: res.data,
     });
 
-    // if it was a success, we must store the token
+    // if it was a success, token is stored
     localStorage.setItem('token', res.data.token);
     dispatch(loadUser());
   } catch (err) {
@@ -80,4 +82,7 @@ export const login = (email, password) => async dispatch => {
 };
 
 // logout user
-export const logout = () => ({ type: LOGOUT });
+export const logout = () => {
+  localStorage.removeItem('token');
+  return { type: LOGOUT };
+};
