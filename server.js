@@ -17,12 +17,25 @@ app.use('/api/profile', require('./routes/api/profile'));
 
 // Socket Connection
 io.on('connection', socket => {
-  socket.on('join room', (roomID, msg) => {
+  console.log('user connect');
+  socket.on('join room', (roomID, info) => {
     socket.join(roomID);
-    socket.to(roomID).emit('user connected', msg);
+    // // var clients = io.sockets.clients(roomID);
+    // io.of('/')
+    //   .in(roomID)
+    //   .clients(function (error, clients) {
+    //     // console.log(clients);
+    //     // console.log(sID);
+    //     // io.clients[sID].send()
+    //     socket.to(socketId).emit('give users', clients);
+    //   });
+    socket.to(roomID).emit('user connected', info);
   });
   socket.on('input message', (roomID, msg) => {
     socket.to(roomID).emit('output message', msg);
+  });
+  socket.on('solved', (roomID, username, session) => {
+    socket.to(roomID).emit('stats', username, session);
   });
 });
 

@@ -398,7 +398,7 @@ const Timer = ({
             {session.solves && session.solves.length > 0 ? (
               session.solves.map(sol => (
                 <span
-                  key='sol._id'
+                  key={sol._id}
                   className='pointer-cursor'
                   onClick={() => setDisplaySolve(session.solves.indexOf(sol))}
                 >
@@ -439,7 +439,7 @@ const Timer = ({
                   <p>Scramble: {session.solves[displaySolve].scramble}</p>
                   <div className='buttons'>
                     <button
-                      className='btn btn-danger btn-small'
+                      className='btn btn-danger btn-small btn-auto'
                       onClick={removeSolve}
                     >
                       Delete
@@ -448,14 +448,14 @@ const Timer = ({
                       <Fragment>
                         {session.solves[displaySolve].penalty !== '+2' && (
                           <button
-                            className='btn btn-light btn-small'
+                            className='btn btn-light btn-small btn-auto'
                             onClick={plus2}
                           >
                             +2
                           </button>
                         )}
                         <button
-                          className='btn btn-light btn-small'
+                          className='btn btn-light btn-small btn-auto'
                           onClick={dnf}
                         >
                           DNF

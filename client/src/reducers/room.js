@@ -2,6 +2,9 @@ import {
   ROOM_ERROR,
   CREATE_ROOM,
   LEAVE_ROOM,
+  JOIN_ROOM,
+  SET_ROOM,
+  GET_STATS,
   RECEIVE_MESSAGE,
 } from '../actions/types';
 
@@ -27,6 +30,21 @@ export default function (state = initialState, action) {
         ...state,
         roomID: payload,
         isHost: false,
+      };
+    case SET_ROOM:
+      return {
+        ...state,
+        roomID: payload,
+      };
+    case JOIN_ROOM:
+      return {
+        ...state,
+        users: payload,
+      };
+    case GET_STATS:
+      return {
+        ...state,
+        users: [...state.users, payload],
       };
     case RECEIVE_MESSAGE:
       return {

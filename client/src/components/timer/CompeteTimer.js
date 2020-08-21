@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
+import moment from 'moment';
+
 import {
   getSession,
   newSession,
@@ -13,7 +15,7 @@ import {
   updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
-import { leaveRoom } from '../../actions/room';
+import { leaveRoom, joinedRoom, getStats, setRoom } from '../../actions/room';
 import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -31,6 +33,10 @@ const CompeteTimer = ({
   updateStats,
   getCurrentProfile,
   leaveRoom,
+  setRoom,
+  joinedRoom,
+  getStats,
+  room,
   profile: { profile },
   solve: { session, loading },
 }) => {
@@ -112,6 +118,7 @@ const CompeteTimer = ({
     t = Math.floor(t * 100) / 100;
     await addSolve(event, { time: t, scramble });
     await updateStats(event);
+    socket.emit('solved', room.roomID, profile.user.username, session);
   };
 
   const generateScramble = async () => {
@@ -204,6 +211,7 @@ const CompeteTimer = ({
     if (!profile) getCurrentProfile();
     getSession(event);
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
+    getStats();
   }, [event, loading]);
 
   useEffect(() => {
@@ -220,6 +228,37 @@ const CompeteTimer = ({
     if (status === '+2') setPenalty('+2');
     if (status === 'DNF') setPenalty('DNF');
   }, [status]);
+  // socket.name = profile.user.username;
+  //     socket.emit('join room', room.roomID, {
+  //       first: true,
+  //       text: 'JOINED THE ROOM',
+  //       username: profile.user.username,
+  //       avatar: profile.user.avatar,
+  //       timestamp: moment().format('hh:mm a'),
+  //     });
+
+  useEffect(() => {
+    if (room.roomID === '') {
+      let url = window.location.href.split('/');
+      setRoom(url[url.length - 1]);
+    }
+    // if (!profile) getCurrentProfile();
+    // if (profile) {
+    //   console.log('reach');
+    //   socket.name = profile.user.username;
+    //   socket.emit('join room', room.roomID, {
+    //     first: true,
+    //     text: 'JOINED THE ROOM',
+    //     username: profile.user.username,
+    //     avatar: profile.user.avatar,
+    //     timestamp: moment().format('hh:mm a'),
+    //   });
+    // }
+
+    socket.on('stats', (username, session) => {
+      getStats(username, session);
+    });
+  }, []);
 
   useSpace('keyup', handleUp);
   useSpace('keydown', handleDown);
@@ -299,89 +338,32 @@ const CompeteTimer = ({
             >
               Leave Room
             </Link>
+            {session.solves &&
+              displaySolve >= 0 &&
+              session.solves[displaySolve].penalty !== 'DNF' && (
+                <Fragment>
+                  {session.solves[displaySolve].penalty !== '+2' && (
+                    <button
+                      className='btn btn-light btn-small btn-auto'
+                      onClick={plus2}
+                    >
+                      +2
+                    </button>
+                  )}
+                  <button
+                    className='btn btn-light btn-small btn-auto'
+                    onClick={dnf}
+                  >
+                    DNF
+                  </button>
+                </Fragment>
+              )}
             <button
               className='btn btn-light btn-small'
               onClick={() => toggleShowMo3(!showMo3)}
             >
               {showMo3 ? 'Hide' : 'Show'} Mean of 3
             </button>
-          </div>
-
-          <div>
-            <h1 className='M'>Stats</h1>
-            {session.solves && session.solves.length >= 3 && showMo3 && (
-              <Fragment>
-                <p>
-                  Current Mean 3:{' '}
-                  <span className='S'>{formatTime(session.cmo3)}</span>
-                </p>
-                <p>
-                  Best Mean 3:{' '}
-                  <span className='S'>{formatTime(session.bmo3)}</span>
-                </p>
-                <br />
-              </Fragment>
-            )}
-            {session.solves && session.solves.length >= 5 && (
-              <Fragment>
-                <p>
-                  Current Avg 5:{' '}
-                  <span className='S'>{formatTime(session.cavg5)}</span>
-                </p>
-                <p>
-                  {'('}Best Avg 5{'): '}
-                  <span className='S'>{formatTime(session.bavg5)}</span>
-                </p>
-                <br />
-              </Fragment>
-            )}
-            {session.solves && session.solves.length >= 12 && (
-              <Fragment>
-                <p>
-                  Current Avg 12:{' '}
-                  <span className='S'>{formatTime(session.cavg12)}</span>
-                </p>
-                <p>
-                  {'['}Best Avg 12{']: '}
-                  <span className='S'>{formatTime(session.bavg12)}</span>
-                </p>
-                <br />
-              </Fragment>
-            )}
-            {session.solves && session.solves.length >= 50 && (
-              <Fragment>
-                <p>
-                  Current Avg 50:{' '}
-                  <span className='S'>{formatTime(session.cavg50)}</span>
-                </p>
-                <p>
-                  {'{'}Best Avg 50{'}: '}
-                  <span className='S'>{formatTime(session.bavg50)}</span>
-                </p>
-                <br />
-              </Fragment>
-            )}
-            {session.solves && session.solves.length >= 100 && (
-              <Fragment>
-                <p>
-                  Current Avg 100:{' '}
-                  <span className='S'>{formatTime(session.cavg100)}</span>
-                </p>
-                <p>
-                  {'<'}Best Avg 100{'>: '}
-                  <span className='S'>{formatTime(session.bavg100)}</span>
-                </p>
-                <br />
-              </Fragment>
-            )}
-            {session.solves && session.solves.length >= 1 && (
-              <Fragment>
-                <p>Number of Solves: {session.numsolves}</p>
-                <p>Session Mean: {formatTime(session.mean)}</p>
-                <p>Best Solve: {formatTime(session.best)}</p>
-                <p>Worst Solve: {formatTime(session.worst)}</p>
-              </Fragment>
-            )}
           </div>
         </div>
         <div>
@@ -423,7 +405,7 @@ const CompeteTimer = ({
             {session.solves && session.solves.length > 0 ? (
               session.solves.map(sol => (
                 <span
-                  key='sol._id'
+                  key={sol._id}
                   className='pointer-cursor'
                   onClick={() => setDisplaySolve(session.solves.indexOf(sol))}
                 >
@@ -449,49 +431,6 @@ const CompeteTimer = ({
               <p>There are currently no solves in this session. </p>
             )}
           </div>
-          <div>
-            {session.solves && session.solves.length > 0 && displaySolve >= 0 && (
-              <Fragment>
-                <p className='S'>Solve Info</p>
-                <div>
-                  <p>Time: {formatTime(session.solves[displaySolve].time)}</p>
-                  {session.solves[displaySolve].penalty && (
-                    <p>Penalty: {session.solves[displaySolve].penalty}</p>
-                  )}
-                  <p>
-                    Solve: {displaySolve + 1}/{session.numsolves}
-                  </p>
-                  <p>Scramble: {session.solves[displaySolve].scramble}</p>
-                  <div className='buttons'>
-                    <button
-                      className='btn btn-danger btn-small'
-                      onClick={removeSolve}
-                    >
-                      Delete
-                    </button>
-                    {session.solves[displaySolve].penalty !== 'DNF' && (
-                      <Fragment>
-                        {session.solves[displaySolve].penalty !== '+2' && (
-                          <button
-                            className='btn btn-light btn-small'
-                            onClick={plus2}
-                          >
-                            +2
-                          </button>
-                        )}
-                        <button
-                          className='btn btn-light btn-small'
-                          onClick={dnf}
-                        >
-                          DNF
-                        </button>
-                      </Fragment>
-                    )}
-                  </div>
-                </div>
-              </Fragment>
-            )}
-          </div>
         </div>
       </div>
       <Chat socket={socket} />
@@ -509,13 +448,18 @@ CompeteTimer.propTypes = {
   updateStats: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   leaveRoom: PropTypes.func.isRequired,
+  setRoom: PropTypes.func.isRequired,
+  joinedRoom: PropTypes.func.isRequired,
+  getStats: PropTypes.func.isRequired,
   solve: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
+  room: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
   solve: state.solve,
   profile: state.profile,
+  room: state.room,
 });
 
 export default connect(mapStateToProps, {
@@ -528,4 +472,7 @@ export default connect(mapStateToProps, {
   updateStats,
   getCurrentProfile,
   leaveRoom,
+  setRoom,
+  joinedRoom,
+  getStats,
 })(CompeteTimer);
