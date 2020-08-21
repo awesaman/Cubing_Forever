@@ -29,6 +29,8 @@ export default function (state = initialState, action) {
       return {
         ...state,
         roomID: payload,
+        chats: [],
+        users: [],
         isHost: false,
       };
     case SET_ROOM:

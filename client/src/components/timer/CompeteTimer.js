@@ -37,6 +37,7 @@ const CompeteTimer = ({
   joinedRoom,
   getStats,
   room,
+  auth: { user },
   profile: { profile },
   solve: { session, loading },
 }) => {
@@ -51,6 +52,7 @@ const CompeteTimer = ({
   const [penalty, setPenalty] = useState('');
   const [status, setStatus] = useState('ready');
   const [green, setGreen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   // variables for time
   var newcs = time.cs,
@@ -180,12 +182,6 @@ const CompeteTimer = ({
     setDisplaySolve(-1);
   };
 
-  const removeSolve = () => {
-    deleteSolve(event, session.solves[displaySolve]._id);
-    setDisplaySolve(displaySolve - 1);
-    updateStats(event);
-  };
-
   const plus2 = async () => {
     await addPenalty(event, session.solves[displaySolve]._id, '+2');
     await updateStats(event);
@@ -211,7 +207,7 @@ const CompeteTimer = ({
     if (!profile) getCurrentProfile();
     getSession(event);
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
-    getStats();
+    // getStats();
   }, [event, loading]);
 
   useEffect(() => {
@@ -228,7 +224,9 @@ const CompeteTimer = ({
     if (status === '+2') setPenalty('+2');
     if (status === 'DNF') setPenalty('DNF');
   }, [status]);
-  // socket.name = profile.user.username;
+  // useEffect(() => {
+  //   socket.name = profile.user.username;
+  // }, [profile]);
   //     socket.emit('join room', room.roomID, {
   //       first: true,
   //       text: 'JOINED THE ROOM',
@@ -254,15 +252,27 @@ const CompeteTimer = ({
     //     timestamp: moment().format('hh:mm a'),
     //   });
     // }
-    socket.on('user connected', (roomID, info) => {
-      joinedRoom(info.username);
-      socket.emit('give users', roomID, socket.id);
-    });
 
-    socket.on('final', username => {
-      console.log('nice');
-      joinedRoom(username);
+    socket.emit('join room', room.roomID, {
+      first: true,
+      text: 'JOINED THE ROOM',
+      username: user.username,
+      avatar: user.avatar,
+      timestamp: moment().format('hh:mm a'),
     });
+    // socket.on('names', username => {
+    //   console.log('nice');
+    //   joinedRoom(username);
+    // });
+    // socket.on('user connected', (roomID, info) => {
+    //   joinedRoom(info.username);
+    //   socket.emit('give users', roomID, socket.id);
+    // });
+
+    // socket.on('final', username => {
+    //   console.log('nice');
+    //   joinedRoom(username);
+    // });
 
     socket.on('stats', (username, session) => {
       getStats(username, session);
@@ -463,12 +473,14 @@ CompeteTimer.propTypes = {
   solve: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
   room: PropTypes.object.isRequired,
+  auth: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
   solve: state.solve,
   profile: state.profile,
   room: state.room,
+  auth: state.auth,
 });
 
 export default connect(mapStateToProps, {

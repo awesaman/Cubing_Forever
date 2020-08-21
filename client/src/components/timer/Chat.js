@@ -37,20 +37,20 @@ const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
     // socketConnection.on('connect', () => {
     //   sID = socketConnection.socket.sessionid;
     // });
-    socket.emit('join room', room.roomID, {
-      first: true,
-      text: 'JOINED THE ROOM',
-      username: user.username,
-      avatar: user.avatar,
-      timestamp: moment().format('hh:mm a'),
-    });
+    // socket.on('send back', socketID => {
+    //   socket.emit('user info', socketID, user.username); //might need to be backend code
+    // });
+    // socket.name = user.username;
+    // socket.emit('join room', room.roomID, {
+    //   first: true,
+    //   text: 'JOINED THE ROOM',
+    //   username: user.username,
+    //   avatar: user.avatar,
+    //   timestamp: moment().format('hh:mm a'),
+    // });
 
     socket.on('user connected', msg => {
       receiveMessage(msg);
-    });
-
-    socket.on('send back', socketID => {
-      socket.emit('user info', socketID, user.username); //might need to be backend code
     });
 
     socket.on('output message', msg => {

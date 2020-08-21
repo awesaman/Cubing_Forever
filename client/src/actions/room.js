@@ -74,6 +74,7 @@ export const getStats = (username, session) => dispatch => {
 // Add users to your list of people
 export const joinedRoom = user => dispatch => {
   const u = { [user]: {} };
+  console.log(u);
   try {
     dispatch({
       type: JOIN_ROOM,
