@@ -1,13 +1,12 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
+import { receiveMessage } from '../../actions/room';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 let chatbox;
-let store = [];
 
-const Chat = ({ socket, room, auth: { user } }) => {
+const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
   const [message, setMessage] = useState('');
-  const [chats, setChats] = useState([]);
 
   const onChange = e => {
     setMessage(e.target.value);
@@ -16,64 +15,51 @@ const Chat = ({ socket, room, auth: { user } }) => {
   const sendMessage = e => {
     e.preventDefault();
 
-    let text = message;
-    let username = user.username;
-    let avatar = user.avatar;
-    let timestamp = moment().format('hh:mm a');
-
-    socket.emit('input message', room.roomID, {
-      text,
-      avatar,
-      username,
-      timestamp,
-    });
-    setChats([
-      ...store,
-      {
-        text,
-        avatar,
-        username,
-        timestamp,
-      },
-    ]);
-    console.log('attempting to send');
+    const msg = {
+      text: message,
+      username: user.username,
+      avatar: user.avatar,
+      timestamp: moment().format('hh:mm a'),
+    };
+    socket.emit('input message', room.roomID, msg);
+    receiveMessage(msg);
     setMessage('');
   };
 
   useEffect(() => {
     if (room.roomID === '') {
       let url = window.location.href.split('/');
-      console.log(url[url.length - 1]);
       room.roomID = url[url.length - 1];
     }
-    console.log('but other things are happening');
+
     socket.emit('join room', room.roomID, {
+      first: true,
       text: 'JOINED THE ROOM',
       username: user.username,
       avatar: user.avatar,
       timestamp: moment().format('hh:mm a'),
     });
+
     socket.on('user connected', msg => {
-      setChats([...store, msg]);
+      receiveMessage(msg);
     });
+
     socket.on('output message', msg => {
-      console.log('msg.text');
-      setChats([...store, msg]);
+      receiveMessage(msg);
     });
   }, []);
 
   useEffect(() => {
     chatbox = document.getElementById('chat-box');
     chatbox.scrollTop = chatbox.scrollHeight;
-    store = chats;
-  }, [chats]);
+  }, [room.chats]);
 
   return (
     <Fragment>
       <div>
         <div className='scrollable' id='chat-box'>
-          {chats.length > 0 &&
-            chats.map((chat, i) => (
+          {room.chats.length > 0 &&
+            room.chats.map((chat, i) => (
               <div key={i} className='chat'>
                 <img
                   src={chat.avatar}
@@ -82,13 +68,15 @@ const Chat = ({ socket, room, auth: { user } }) => {
                 />
                 <div>
                   <small className='text-light'>{chat.username}</small>
-                  <p>{chat.text}</p>
+                  <p className={chat.first ? 'text-light' : 'text-primary'}>
+                    {chat.text}
+                  </p>
                 </div>
                 <small className='mleft gray'>{chat.timestamp}</small>
               </div>
             ))}
         </div>
-        <form onSubmit={sendMessage} className='form'>
+        <form onSubmit={receiveMessage} className='form'>
           <div className='message-box'>
             <input
               id='message'
@@ -111,6 +99,7 @@ const Chat = ({ socket, room, auth: { user } }) => {
 Chat.propTypes = {
   room: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired,
+  receiveMessage: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => {
@@ -120,4 +109,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(Chat);
+export default connect(mapStateToProps, { receiveMessage })(Chat);

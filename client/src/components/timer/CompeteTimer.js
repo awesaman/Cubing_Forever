@@ -241,12 +241,24 @@ const CompeteTimer = ({
             value={event}
             onChange={changeEvent}
           >
-            {profile &&
-              profile.events.map(ev => (
-                <option key={ev._id} value={ev.name}>
-                  {ev.name}
-                </option>
-              ))}
+            <option>* Select Event</option>
+            <option value='3x3'>3x3</option>
+            <option value='2x2'>2x2</option>
+            <option value='4x4'>4x4</option>
+            <option value='5x5'>5x5</option>
+            <option value='6x6'>6x6</option>
+            <option value='7x7'>7x7</option>
+            <option value='3x3 One-Handed'>3x3 One-Handed</option>
+            <option value='3x3 Blindfolded'>3x3 Blindfolded</option>
+            <option value='3x3 Multi-Blind'>3x3 Multi-Blind</option>
+            <option value='3x3 Fewest Moves'>3x3 Fewest Moves</option>
+            <option value='4x4 Blindfolded'>4x4 Blindfolded</option>
+            <option value='5x5 Blindfolded'>5x5 Blindfolded</option>
+            <option value='Pyraminx'>Pyraminx</option>
+            <option value='Megaminx'>Megaminx</option>
+            <option value='Square-1'>Square-1</option>
+            <option value='Skewb'>Skewb</option>
+            <option value="Rubik's Clock">Rubik's Clock</option>
           </select>
         </div>
         <div className='sidebar'>

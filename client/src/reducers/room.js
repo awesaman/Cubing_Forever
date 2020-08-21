@@ -1,4 +1,9 @@
-import { ROOM_ERROR, CREATE_ROOM, LEAVE_ROOM } from '../actions/types';
+import {
+  ROOM_ERROR,
+  CREATE_ROOM,
+  LEAVE_ROOM,
+  RECEIVE_MESSAGE,
+} from '../actions/types';
 
 const initialState = {
   roomID: '',
@@ -22,6 +27,11 @@ export default function (state = initialState, action) {
         ...state,
         roomID: payload,
         isHost: false,
+      };
+    case RECEIVE_MESSAGE:
+      return {
+        ...state,
+        chats: payload,
       };
     case ROOM_ERROR:
       return {
