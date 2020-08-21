@@ -5,6 +5,7 @@ import {
   JOIN_ROOM,
   SET_ROOM,
   RECEIVE_MESSAGE,
+  GET_STATS,
 } from './types';
 import v4 from 'uuid';
 import store from '../store';
@@ -55,13 +56,12 @@ export const receiveMessage = msg => dispatch => {
 };
 
 // Gets solving statistics about other users in the room
-export const getStats = () => dispatch => {
-  let session = store.getState().solve.session;
-  console.log(session);
+export const getStats = (username, session) => dispatch => {
+  // let session = stor)e.getState().solve.session;
   try {
     dispatch({
-      type: RECEIVE_MESSAGE,
-      payload: [],
+      type: GET_STATS,
+      payload: { ...store.getState().room.users, [username]: session },
     });
   } catch (err) {
     dispatch({
@@ -73,10 +73,11 @@ export const getStats = () => dispatch => {
 
 // Add users to your list of people
 export const joinedRoom = user => dispatch => {
+  const u = { [user]: {} };
   try {
     dispatch({
       type: JOIN_ROOM,
-      payload: [...store.getState().room.users, user],
+      payload: [...store.getState().room.users, u],
     });
   } catch (err) {
     dispatch({

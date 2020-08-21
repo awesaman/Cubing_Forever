@@ -44,7 +44,7 @@ export default function (state = initialState, action) {
     case GET_STATS:
       return {
         ...state,
-        users: [...state.users, payload],
+        users: payload,
       };
     case RECEIVE_MESSAGE:
       return {

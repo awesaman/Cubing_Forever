@@ -254,6 +254,15 @@ const CompeteTimer = ({
     //     timestamp: moment().format('hh:mm a'),
     //   });
     // }
+    socket.on('user connected', (roomID, info) => {
+      joinedRoom(info.username);
+      socket.emit('give users', roomID, socket.id);
+    });
+
+    socket.on('final', username => {
+      console.log('nice');
+      joinedRoom(username);
+    });
 
     socket.on('stats', (username, session) => {
       getStats(username, session);

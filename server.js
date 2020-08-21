@@ -29,10 +29,16 @@ io.on('connection', socket => {
     //     // io.clients[sID].send()
     //     socket.to(socketId).emit('give users', clients);
     //   });
-    socket.to(roomID).emit('user connected', info);
+    socket.to(roomID).emit('user connected', roomID, info);
   });
   socket.on('input message', (roomID, msg) => {
     socket.to(roomID).emit('output message', msg);
+  });
+  socket.on('send back', (socketID, username) => {
+    io.to(socketID).emit('final', username);
+  });
+  socket.on('give users', (roomID, socketID) => {
+    socket.to(roomID).emit('send back', socketID);
   });
   socket.on('solved', (roomID, username, session) => {
     socket.to(roomID).emit('stats', username, session);

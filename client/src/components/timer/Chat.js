@@ -49,6 +49,10 @@ const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
       receiveMessage(msg);
     });
 
+    socket.on('send back', socketID => {
+      socket.emit('user info', socketID, user.username); //might need to be backend code
+    });
+
     socket.on('output message', msg => {
       receiveMessage(msg);
     });
