@@ -1,24 +1,33 @@
-import { ROOM_ERROR, CREATE_ROOM } from './types';
+import { ROOM_ERROR, CREATE_ROOM, LEAVE_ROOM } from './types';
 import v4 from 'uuid';
+import store from '../store';
 
-// Get current users profile
+// Create a room
 export const createRoom = () => dispatch => {
-  dispatch({
-    type: CREATE_ROOM,
-    payload: v4(),
-  });
+  try {
+    dispatch({
+      type: CREATE_ROOM,
+      payload: v4(),
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
 };
-// // Get current users profile
-// export const createRoom = () => dispatch => {
-//   try {
-//     dispatch({
-//       type: CREATE_ROOM,
-//       payload: res.data,
-//     });
-//   } catch (err) {
-//     dispatch({
-//       type: ROOM_ERROR,
-//       payload: { msg: err.response.statusText, status: err.response.status },
-//     });
-//   }
-// };
+
+// Leave a room
+export const leaveRoom = () => dispatch => {
+  try {
+    dispatch({
+      type: LEAVE_ROOM,
+      payload: '',
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
+};

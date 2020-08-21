@@ -2,12 +2,10 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import io from 'socket.io-client';
-let socket = io('http://localhost:5000');
 let chatbox;
 let store = [];
 
-const Chat = ({ room, auth: { user } }) => {
+const Chat = ({ socket, room, auth: { user } }) => {
   const [message, setMessage] = useState('');
   const [chats, setChats] = useState([]);
 
@@ -49,9 +47,14 @@ const Chat = ({ room, auth: { user } }) => {
       room.roomID = url[url.length - 1];
     }
     console.log('but other things are happening');
-    socket.emit('join room', room.roomID, user.username);
-    socket.on('user connected', username => {
-      console.log(username + ' connected');
+    socket.emit('join room', room.roomID, {
+      text: 'JOINED THE ROOM',
+      username: user.username,
+      avatar: user.avatar,
+      timestamp: moment().format('hh:mm a'),
+    });
+    socket.on('user connected', msg => {
+      setChats([...store, msg]);
     });
     socket.on('output message', msg => {
       console.log('msg.text');

@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
@@ -12,9 +13,13 @@ import {
   updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
+import { leaveRoom } from '../../actions/room';
 import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import io from 'socket.io-client';
+
+let socket = io('http://localhost:5000');
 
 const CompeteTimer = ({
   getSession,
@@ -25,6 +30,7 @@ const CompeteTimer = ({
   deleteSolve,
   updateStats,
   getCurrentProfile,
+  leaveRoom,
   profile: { profile },
   solve: { session, loading },
 }) => {
@@ -274,6 +280,13 @@ const CompeteTimer = ({
             >
               Turn {inspection ? 'off' : 'on'} Inspection
             </button>
+            <Link
+              to='/compete'
+              className='btn btn-danger btn-small'
+              onClick={leaveRoom}
+            >
+              Leave Room
+            </Link>
             <button
               className='btn btn-light btn-small'
               onClick={() => toggleShowMo3(!showMo3)}
@@ -469,7 +482,7 @@ const CompeteTimer = ({
           </div>
         </div>
       </div>
-      <Chat />
+      <Chat socket={socket} />
     </Fragment>
   );
 };
@@ -483,6 +496,7 @@ CompeteTimer.propTypes = {
   deleteSolve: PropTypes.func.isRequired,
   updateStats: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
+  leaveRoom: PropTypes.func.isRequired,
   solve: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
 };
@@ -501,4 +515,5 @@ export default connect(mapStateToProps, {
   deleteSolve,
   updateStats,
   getCurrentProfile,
+  leaveRoom,
 })(CompeteTimer);

@@ -2,7 +2,7 @@
 
 $primary-color: #3ab2f2;
 $dark-color: #2d3237;
-$gray-color: #4b4b4b;
+$gray-color: #111111;
 $light-color: #f4f4f4;
 $danger-color: #d72a3b;
 $success-color: #1dd247;
@@ -85,8 +85,8 @@ img {
   font-size: 1.5em;
   border: none;
   margin-right: 0.5em;
-  transition: opacity 2s ease-in;
   border-radius: 0.7em;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -110,7 +110,7 @@ img {
   background: $danger-color;
   color: $light-color;
   &:hover {
-    color: $primary-color;
+    color: $dark-color;
   }
 }
 
@@ -432,6 +432,7 @@ button {
 .btn-small {
   font-size: 1em;
   margin: 0.5em 0.5em;
+  width: stretch;
 }
 
 .centiseconds {

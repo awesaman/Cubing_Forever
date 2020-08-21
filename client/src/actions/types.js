@@ -24,3 +24,4 @@ export const SEND_MESSAGE = 'SEND_MESSAGE';
 export const CHAT_ERROR = 'CHAT_ERROR';
 export const ROOM_ERROR = 'ROOM_ERROR';
 export const CREATE_ROOM = 'CREATE_ROOM';
+export const LEAVE_ROOM = 'LEAVE_ROOM';

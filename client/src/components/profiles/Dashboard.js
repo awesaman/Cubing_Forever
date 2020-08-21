@@ -76,8 +76,9 @@ const Dashboard = ({
       ) : (
         <Fragment>
           <p>
-            You have not set up a profile. Create a profile using the link
-            below:
+            You have not yet set up a profile. You should add events to your
+            profile so the app can be customized to your needs! Create a profile
+            using the link below:
           </p>
           <br />
           <Link to='/create-profile' className='btn btn-primary my-1'>
