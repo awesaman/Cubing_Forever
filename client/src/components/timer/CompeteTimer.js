@@ -1,11 +1,10 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
 import moment from 'moment';
 import Stats from './Stats';
-
 import {
   getSession,
   newSession,
@@ -15,7 +14,13 @@ import {
   updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
-import { leaveRoom, getStats, setRoom } from '../../actions/room';
+import {
+  leaveRoom,
+  getStats,
+  setRoom,
+  setRoomEvent,
+  setRoomScramble,
+} from '../../actions/room';
 import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -32,6 +37,8 @@ const CompeteTimer = ({
   getCurrentProfile,
   leaveRoom,
   setRoom,
+  setRoomEvent,
+  setRoomScramble,
   getStats,
   room,
   auth: { user },
@@ -40,8 +47,7 @@ const CompeteTimer = ({
 }) => {
   // state
   const [event, setEvent] = useState('3x3');
-  const [displaySolve, setDisplaySolve] = useState(-1);
-  const [scramble, setScramble] = useState('Loading...');
+  const [scramble, setScramble] = useState('Host has not started the session');
   const [inspection, toggleInspection] = useState(false);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
   const [repeater, setRepeater] = useState();
@@ -56,7 +62,6 @@ const CompeteTimer = ({
   const [cavg12, setcavg12] = useState(false);
   const [best, setbest] = useState(true);
   const [worst, setworst] = useState(true);
-  var x = document.getElementsByClassName('cavg12')[0];
 
   // variables for time
   var newcs = time.cs,
@@ -98,7 +103,6 @@ const CompeteTimer = ({
   const reset = () => {
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
     clearInterval(repeater);
-    // setPenalty('');
     newcs = news = newm = newh = 0;
   };
 
@@ -122,7 +126,7 @@ const CompeteTimer = ({
     setStatus('stopped');
     let t = 3600 * time.h + 60 * time.m + time.s + 0.01 * time.cs;
     t = Math.floor(t * 100) / 100;
-    await addSolve(event, { time: t, scramble });
+    await addSolve(event, { time: t, scramble: room.scramble });
     await updateStats(event);
   };
 
@@ -132,20 +136,28 @@ const CompeteTimer = ({
     if (ev.slice(0, 3) === '444') ev = '444';
     if (ev.slice(0, 3) === '555') ev = '555';
     const seeded_scramble = new Scrambow().setType(ev).get();
-    socket.emit(seeded_scramble[0].scramble_string);
+    const final_scramble = seeded_scramble[0].scramble_string;
+    socket.emit('new scramble', room.roomID, final_scramble);
+    setRoomScramble(final_scramble);
+    setScramble(final_scramble);
   };
 
   // handle pressing the spacebar
   const handleUp = () => {
-    if (status === 'ready') inspection ? inspect() : start();
-    if (status === 'inspecting' || status === '+2' || status === 'DNF') start();
-    if (status === 'stopped') setStatus('ready');
-    setGreen(false);
+    if (scramble !== room.scramble) {
+      if (status === 'ready') inspection ? inspect() : start();
+      if (status === 'inspecting' || status === '+2' || status === 'DNF')
+        start();
+      if (status === 'stopped') setStatus('ready');
+      setGreen(false);
+    }
   };
 
   const handleDown = () => {
-    if (status === 'started') stop();
-    else setGreen(true);
+    if (scramble !== room.scramble) {
+      if (status === 'started') stop();
+      else setGreen(true);
+    }
   };
 
   // general helpful functions
@@ -182,21 +194,19 @@ const CompeteTimer = ({
   // handling all options available to the user
   const changeEvent = async e => {
     await setEvent(e.target.value);
-    setDisplaySolve(-1);
   };
 
   const plus2 = async () => {
-    await addPenalty(event, session.solves[displaySolve]._id, '+2');
+    await addPenalty(event, session.solves[session.numsolves - 1]._id, '+2');
     await updateStats(event);
   };
 
   const dnf = async () => {
-    await addPenalty(event, session.solves[displaySolve]._id, 'DNF');
+    await addPenalty(event, session.solves[session.numsolves - 1]._id, 'DNF');
     await updateStats(event);
   };
 
   const clearSolves = async () => {
-    await setDisplaySolve(-1);
     await clearSession(event);
   };
 
@@ -208,18 +218,19 @@ const CompeteTimer = ({
   // functions to run when state changes
   useEffect(() => {
     if (!profile) getCurrentProfile();
-    getSession(event);
+    getNewSession(event);
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
-    // getStats();
+    if (room.isHost) {
+      socket.emit('new event', room.roomID, event);
+      setRoomEvent(event);
+    }
   }, [event, loading]);
 
   useEffect(() => {
-    if (session.solves && session.solves.length > 0)
-      setDisplaySolve(session.solves.length - 1);
-    else setDisplaySolve(-1);
     if (penalty !== '')
       addPenalty(event, session.solves[session.solves.length - 1]._id, penalty);
     setPenalty('');
+    setScramble(scramble);
     socket.emit('solved', room.roomID, user.username, session);
   }, [session.solves]);
 
@@ -239,6 +250,8 @@ const CompeteTimer = ({
   //     });
 
   useEffect(() => {
+    if (!profile) getCurrentProfile();
+
     if (room.roomID === '') {
       let url = window.location.href.split('/');
       setRoom(url[url.length - 1]);
@@ -259,16 +272,17 @@ const CompeteTimer = ({
     //   console.log('nice');
     //   joinedRoom(username);
     // });
-    // socket.on('user connected', (roomID, info) => {
-    //   joinedRoom(info.username);
-    //   socket.emit('give users', roomID, socket.id);
-    // });
+    if (room.isHost) {
+      socket.on('user connected', socketID => {
+        socket.emit('event scramble', event, scramble, socketID);
+      });
+    }
     // socket.on('final', username => {
     //   console.log('nice');
     //   joinedRoom(username);
     // });
 
-    socket.emit('join room', room.roomID, {
+    socket.emit('join room', room.roomID, socket.id, {
       first: true,
       text: 'JOINED THE ROOM',
       username: user.username,
@@ -278,6 +292,19 @@ const CompeteTimer = ({
 
     socket.on('stats', (username, session) => {
       getStats(username, session);
+    });
+
+    socket.on('get scramble', scramble => {
+      setRoomScramble(scramble);
+    });
+
+    socket.on('get event', event => {
+      setRoomEvent(event);
+    });
+
+    socket.on('get both', (event, scramble) => {
+      setRoomEvent(event);
+      setRoomScramble(scramble);
     });
   }, []);
 
@@ -313,39 +340,51 @@ const CompeteTimer = ({
           </div>
         ) : (
           <div className='timer-top'>
-            <div>
-              {/* <img
-                src={require(`../../img/events/${eventNaming[room.event]}.svg`)}
-                alt={room.event}
-                className='small-image'
-              /> */}
-            </div>
-            <p className='M inline mright'>{room.event}</p>
-            {profile &&
-            profile.events.map(ev => ev.name).includes(room.event) ? (
-              <span>HOST CHOOSES EVENT</span>
-            ) : (
-              <span>
-                This event is not in your profile. Please add it to your profile
-                and return to the room.
-              </span>
+            {room && room.event !== '' && (
+              <Fragment>
+                <div>
+                  <img
+                    src={require(`../../img/events/${
+                      eventNaming[room.event]
+                    }.svg`)}
+                    alt={room.event}
+                    className='small-image mright'
+                  />
+                </div>
+                <p className='L inline mright smleft'>{room.event}</p>
+                {profile &&
+                  profile.events &&
+                  profile !== null &&
+                  !profile.events.map(ev => ev.name).includes(room.event) && (
+                    <Fragment>
+                      {console.log(profile)}
+                      {window.alert(
+                        'This event is not in your profile. Please add it to your profile and return to the room.'
+                      )}
+                      <Redirect to='/edit-profile' />
+                    </Fragment>
+                  )}
+              </Fragment>
             )}
+            <span>HOST CHOOSES EVENT</span>
           </div>
         )}
         <div className='sidebar'>
           <div className='mbottom'>
             <h1 className='M'>Options</h1>
-            {session.solves && session.solves.length !== 0 && room.isHost && (
+            {room.isHost && (
               <button
-                className='btn btn-light btn-small'
+                className='btn btn-success btn-small'
                 onClick={() => generateScramble()}
               >
-                New Scramble
+                Next Scramble
               </button>
             )}
-            <button className='btn btn-light btn-small' onClick={clearSolves}>
-              Clear Session
-            </button>
+            {session.solves && session.solves.length !== 0 && (
+              <button className='btn btn-light btn-small' onClick={clearSolves}>
+                Clear Session
+              </button>
+            )}
             <button
               className='btn btn-light btn-small'
               onClick={() => toggleInspection(!inspection)}
@@ -360,10 +399,10 @@ const CompeteTimer = ({
               Leave Room
             </Link>
             {session.solves &&
-              displaySolve >= 0 &&
-              session.solves[displaySolve].penalty !== 'DNF' && (
+              session.solves.length > 1 &&
+              session.solves[session.numsolves - 1].penalty !== 'DNF' && (
                 <Fragment>
-                  {session.solves[displaySolve].penalty !== '+2' && (
+                  {session.solves[session.numsolves - 1].penalty !== '+2' && (
                     <button
                       className='btn btn-light btn-small btn-auto'
                       onClick={plus2}
@@ -466,7 +505,10 @@ const CompeteTimer = ({
           )}
           {status === '+2' && <h1 className='XL red'>+2</h1>}
           {status === 'DNF' && <h1 className='XL red'>DNF</h1>}
-          <p>Scramble: {scramble}</p>
+          <p>Scramble: {room && room.scramble}</p>
+          {room && room.isHost === false && scramble === room.scramble && (
+            <p>Waiting for next scramble...</p>
+          )}
         </div>
         <div className='solves stats-table'>
           <p className='S inline'>Solves </p>
@@ -499,6 +541,8 @@ CompeteTimer.propTypes = {
   getCurrentProfile: PropTypes.func.isRequired,
   leaveRoom: PropTypes.func.isRequired,
   setRoom: PropTypes.func.isRequired,
+  setRoomEvent: PropTypes.func.isRequired,
+  setRoomScramble: PropTypes.func.isRequired,
   getStats: PropTypes.func.isRequired,
   solve: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
@@ -523,5 +567,7 @@ export default connect(mapStateToProps, {
   getCurrentProfile,
   leaveRoom,
   setRoom,
+  setRoomEvent,
+  setRoomScramble,
   getStats,
 })(CompeteTimer);

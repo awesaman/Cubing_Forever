@@ -5,6 +5,8 @@ import {
   SET_ROOM,
   GET_STATS,
   RECEIVE_MESSAGE,
+  SET_EVENT,
+  SET_SCRAMBLE,
 } from '../actions/types';
 
 const initialState = {
@@ -14,6 +16,7 @@ const initialState = {
   chats: [],
   scramble: '',
   event: '',
+  hostPresent: true,
 };
 
 export default function (state = initialState, action) {
@@ -25,14 +28,16 @@ export default function (state = initialState, action) {
         ...state,
         roomID: payload,
         isHost: true,
+        hostPresent: true,
       };
     case LEAVE_ROOM:
       return {
         ...state,
-        roomID: payload,
+        roomID: payload.roomID,
         chats: [],
         stats: [],
         isHost: false,
+        hostPresent: payload.hostPresent,
       };
     case SET_ROOM:
       return {
@@ -48,6 +53,16 @@ export default function (state = initialState, action) {
       return {
         ...state,
         chats: payload,
+      };
+    case SET_EVENT:
+      return {
+        ...state,
+        event: payload,
+      };
+    case SET_SCRAMBLE:
+      return {
+        ...state,
+        scramble: payload,
       };
     case ROOM_ERROR:
       return {

@@ -6,16 +6,18 @@ import {
   SET_ROOM,
   RECEIVE_MESSAGE,
   GET_STATS,
+  SET_SCRAMBLE,
+  SET_EVENT,
 } from './types';
 import v4 from 'uuid';
 import store from '../store';
 
 // Create a room
-export const createRoom = () => dispatch => {
+export const createRoom = (id = v4()) => dispatch => {
   try {
     dispatch({
       type: CREATE_ROOM,
-      payload: v4(),
+      payload: id,
     });
   } catch (err) {
     dispatch({
@@ -94,6 +96,36 @@ export const setRoom = id => dispatch => {
     dispatch({
       type: SET_ROOM,
       payload: id,
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
+};
+
+// Set Room Event
+export const setRoomEvent = event => dispatch => {
+  try {
+    dispatch({
+      type: SET_EVENT,
+      payload: event,
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
+};
+
+// Set Room ID
+export const setRoomScramble = scramble => dispatch => {
+  try {
+    dispatch({
+      type: SET_SCRAMBLE,
+      payload: scramble,
     });
   } catch (err) {
     dispatch({

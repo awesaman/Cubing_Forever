@@ -17,7 +17,7 @@ app.use('/api/profile', require('./routes/api/profile'));
 
 // Socket Connection
 io.on('connection', socket => {
-  socket.on('join room', (roomID, info) => {
+  socket.on('join room', (roomID, socketID, info) => {
     socket.join(roomID);
     // // var clients = io.sockets.clients(roomID);
     // io.of('/')
@@ -28,7 +28,7 @@ io.on('connection', socket => {
     //     // io.clients[sID].send()
     //     socket.to(socketId).emit('give users', clients);
     //   });
-    socket.to(roomID).emit('user connected', info);
+    socket.to(roomID).emit('user connected', socketID, info);
   });
   socket.on('input message', (roomID, msg) => {
     socket.to(roomID).emit('output message', msg);
@@ -47,6 +47,18 @@ io.on('connection', socket => {
   // });
   socket.on('solved', (roomID, username, session) => {
     socket.to(roomID).emit('stats', username, session);
+  });
+
+  socket.on('new scramble', (roomID, scramble) => {
+    socket.to(roomID).emit('get scramble', scramble);
+  });
+
+  socket.on('new event', (roomID, event) => {
+    socket.to(roomID).emit('get event', event);
+  });
+
+  socket.on('event scramble', (event, scramble, socketID) => {
+    socket.to(socketID).emit('get both', event, scramble);
   });
 });
 

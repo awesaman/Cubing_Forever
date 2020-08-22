@@ -49,7 +49,7 @@ const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
     //   timestamp: moment().format('hh:mm a'),
     // });
 
-    socket.on('user connected', msg => {
+    socket.on('user connected', (socketID, msg) => {
       receiveMessage(msg);
     });
 

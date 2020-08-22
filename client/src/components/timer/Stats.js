@@ -155,7 +155,6 @@ const Stats = ({
 
 Stats.propTypes = {
   formatTime: PropTypes.func.isRequired,
-  socket: PropTypes.object.isRequired,
   bmo3: PropTypes.bool.isRequired,
   cmo3: PropTypes.bool.isRequired,
   bavg5: PropTypes.bool.isRequired,
