@@ -4,6 +4,7 @@ import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
 import moment from 'moment';
+import Stats from './Stats';
 
 import {
   getSession,
@@ -11,30 +12,26 @@ import {
   clearSession,
   addSolve,
   addPenalty,
-  deleteSolve,
   updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
-import { leaveRoom, joinedRoom, getStats, setRoom } from '../../actions/room';
+import { leaveRoom, getStats, setRoom } from '../../actions/room';
 import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
 
 let socket = io('http://localhost:5000');
-
 const CompeteTimer = ({
   getSession,
   newSession,
   clearSession,
   addSolve,
   addPenalty,
-  deleteSolve,
   updateStats,
   getCurrentProfile,
   leaveRoom,
   setRoom,
-  joinedRoom,
   getStats,
   room,
   auth: { user },
@@ -45,14 +42,21 @@ const CompeteTimer = ({
   const [event, setEvent] = useState('3x3');
   const [displaySolve, setDisplaySolve] = useState(-1);
   const [scramble, setScramble] = useState('Loading...');
-  const [showMo3, toggleShowMo3] = useState(false);
   const [inspection, toggleInspection] = useState(false);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
   const [repeater, setRepeater] = useState();
   const [penalty, setPenalty] = useState('');
   const [status, setStatus] = useState('ready');
   const [green, setGreen] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [bmo3, setbmo3] = useState(false);
+  const [cmo3, setcmo3] = useState(false);
+  const [bavg5, setbavg5] = useState(true);
+  const [cavg5, setcavg5] = useState(true);
+  const [bavg12, setbavg12] = useState(false);
+  const [cavg12, setcavg12] = useState(false);
+  const [best, setbest] = useState(true);
+  const [worst, setworst] = useState(true);
+  var x = document.getElementsByClassName('cavg12')[0];
 
   // variables for time
   var newcs = time.cs,
@@ -120,16 +124,15 @@ const CompeteTimer = ({
     t = Math.floor(t * 100) / 100;
     await addSolve(event, { time: t, scramble });
     await updateStats(event);
-    socket.emit('solved', room.roomID, profile.user.username, session);
   };
 
-  const generateScramble = async () => {
+  const generateScramble = () => {
     let ev = eventNaming[event];
     if (ev.slice(0, 3) === '333' && ev !== '333fm') ev = '333';
     if (ev.slice(0, 3) === '444') ev = '444';
     if (ev.slice(0, 3) === '555') ev = '555';
     const seeded_scramble = new Scrambow().setType(ev).get();
-    await setScramble(seeded_scramble[0].scramble_string);
+    socket.emit(seeded_scramble[0].scramble_string);
   };
 
   // handle pressing the spacebar
@@ -214,10 +217,10 @@ const CompeteTimer = ({
     if (session.solves && session.solves.length > 0)
       setDisplaySolve(session.solves.length - 1);
     else setDisplaySolve(-1);
-    generateScramble();
     if (penalty !== '')
       addPenalty(event, session.solves[session.solves.length - 1]._id, penalty);
     setPenalty('');
+    socket.emit('solved', room.roomID, user.username, session);
   }, [session.solves]);
 
   useEffect(() => {
@@ -252,14 +255,6 @@ const CompeteTimer = ({
     //     timestamp: moment().format('hh:mm a'),
     //   });
     // }
-
-    socket.emit('join room', room.roomID, {
-      first: true,
-      text: 'JOINED THE ROOM',
-      username: user.username,
-      avatar: user.avatar,
-      timestamp: moment().format('hh:mm a'),
-    });
     // socket.on('names', username => {
     //   console.log('nice');
     //   joinedRoom(username);
@@ -268,11 +263,18 @@ const CompeteTimer = ({
     //   joinedRoom(info.username);
     //   socket.emit('give users', roomID, socket.id);
     // });
-
     // socket.on('final', username => {
     //   console.log('nice');
     //   joinedRoom(username);
     // });
+
+    socket.emit('join room', room.roomID, {
+      first: true,
+      text: 'JOINED THE ROOM',
+      username: user.username,
+      avatar: user.avatar,
+      timestamp: moment().format('hh:mm a'),
+    });
 
     socket.on('stats', (username, session) => {
       getStats(username, session);
@@ -285,64 +287,64 @@ const CompeteTimer = ({
   return (
     <Fragment>
       <div className='timer'>
-        <div className='timer-top'>
-          <div>
-            <img
-              src={require(`../../img/events/${eventNaming[event]}.svg`)}
-              alt={event.name}
-              className='small-image'
-            />
+        {room.isHost ? (
+          <div className='timer-top'>
+            <div>
+              <img
+                src={require(`../../img/events/${eventNaming[event]}.svg`)}
+                alt={event.name}
+                className='small-image'
+              />
+            </div>
+            <select
+              className='event-picker'
+              name='name'
+              value={event}
+              onChange={changeEvent}
+            >
+              {profile &&
+                profile.events.map(ev => (
+                  <option key={ev._id} value={ev.name}>
+                    {ev.name}
+                  </option>
+                ))}
+            </select>
+            <span>YOU ARE THE HOST</span>
           </div>
-          <select
-            className='event-picker'
-            name='name'
-            value={event}
-            onChange={changeEvent}
-          >
-            <option>* Select Event</option>
-            <option value='3x3'>3x3</option>
-            <option value='2x2'>2x2</option>
-            <option value='4x4'>4x4</option>
-            <option value='5x5'>5x5</option>
-            <option value='6x6'>6x6</option>
-            <option value='7x7'>7x7</option>
-            <option value='3x3 One-Handed'>3x3 One-Handed</option>
-            <option value='3x3 Blindfolded'>3x3 Blindfolded</option>
-            <option value='3x3 Multi-Blind'>3x3 Multi-Blind</option>
-            <option value='3x3 Fewest Moves'>3x3 Fewest Moves</option>
-            <option value='4x4 Blindfolded'>4x4 Blindfolded</option>
-            <option value='5x5 Blindfolded'>5x5 Blindfolded</option>
-            <option value='Pyraminx'>Pyraminx</option>
-            <option value='Megaminx'>Megaminx</option>
-            <option value='Square-1'>Square-1</option>
-            <option value='Skewb'>Skewb</option>
-            <option value="Rubik's Clock">Rubik's Clock</option>
-          </select>
-        </div>
+        ) : (
+          <div className='timer-top'>
+            <div>
+              {/* <img
+                src={require(`../../img/events/${eventNaming[room.event]}.svg`)}
+                alt={room.event}
+                className='small-image'
+              /> */}
+            </div>
+            <p className='M inline mright'>{room.event}</p>
+            {profile &&
+            profile.events.map(ev => ev.name).includes(room.event) ? (
+              <span>HOST CHOOSES EVENT</span>
+            ) : (
+              <span>
+                This event is not in your profile. Please add it to your profile
+                and return to the room.
+              </span>
+            )}
+          </div>
+        )}
         <div className='sidebar'>
           <div className='mbottom'>
             <h1 className='M'>Options</h1>
-            {session.solves && session.solves.length !== 0 && (
-              <Fragment>
-                <button
-                  className='btn btn-light btn-small'
-                  onClick={getNewSession}
-                >
-                  New Session
-                </button>
-                <button
-                  className='btn btn-light btn-small'
-                  onClick={clearSolves}
-                >
-                  Clear Session
-                </button>
-              </Fragment>
+            {session.solves && session.solves.length !== 0 && room.isHost && (
+              <button
+                className='btn btn-light btn-small'
+                onClick={() => generateScramble()}
+              >
+                New Scramble
+              </button>
             )}
-            <button
-              className='btn btn-light btn-small'
-              onClick={() => generateScramble()}
-            >
-              New Scramble
+            <button className='btn btn-light btn-small' onClick={clearSolves}>
+              Clear Session
             </button>
             <button
               className='btn btn-light btn-small'
@@ -377,12 +379,64 @@ const CompeteTimer = ({
                   </button>
                 </Fragment>
               )}
-            <button
-              className='btn btn-light btn-small'
-              onClick={() => toggleShowMo3(!showMo3)}
-            >
-              {showMo3 ? 'Hide' : 'Show'} Mean of 3
-            </button>
+            <div className='checkboxes'>
+              <div className='bubble-group'>
+                <div
+                  className='bubble'
+                  style={cmo3 ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setcmo3(!cmo3)}
+                />
+                Mean 3
+                <div
+                  className='bubble'
+                  style={bmo3 ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setbmo3(!bmo3)}
+                />
+                Best Mean 3
+              </div>
+              <div className='bubble-group'>
+                <div
+                  className='bubble'
+                  style={cavg5 ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setcavg5(!cavg5)}
+                />{' '}
+                Avg 5
+                <div
+                  className='bubble'
+                  style={bavg5 ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setbavg5(!bavg5)}
+                />{' '}
+                Best Avg 5
+              </div>
+              <div className='bubble-group'>
+                <div
+                  className='bubble'
+                  style={cavg12 ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setcavg12(!cavg12)}
+                />{' '}
+                Avg 12
+                <div
+                  className='bubble'
+                  style={bavg12 ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setbavg12(!bavg12)}
+                />{' '}
+                Best Avg 12
+              </div>
+            </div>
+            <div className='bubble-group'>
+              <div
+                className='bubble'
+                style={best ? { backgroundColor: '#bbb' } : {}}
+                onClick={() => setbest(!best)}
+              />{' '}
+              Best Single
+              <div
+                className='bubble'
+                style={worst ? { backgroundColor: '#bbb' } : {}}
+                onClick={() => setworst(!worst)}
+              />{' '}
+              Worst
+            </div>
           </div>
         </div>
         <div>
@@ -414,42 +468,20 @@ const CompeteTimer = ({
           {status === 'DNF' && <h1 className='XL red'>DNF</h1>}
           <p>Scramble: {scramble}</p>
         </div>
-        <div className='solves'>
+        <div className='solves stats-table'>
           <p className='S inline'>Solves </p>
-          <small className='inline'>
-            (click on a solve to reveal info about it)
-          </small>
           <br />
-          <div className='mbottom'>
-            {session.solves && session.solves.length > 0 ? (
-              session.solves.map(sol => (
-                <span
-                  key={sol._id}
-                  className='pointer-cursor'
-                  onClick={() => setDisplaySolve(session.solves.indexOf(sol))}
-                >
-                  {session.solves.indexOf(sol) === session.bavg100loc && '<'}
-                  {session.solves.indexOf(sol) === session.bavg50loc && '{'}
-                  {session.solves.indexOf(sol) === session.bavg12loc && '['}
-                  {session.solves.indexOf(sol) === session.bavg5loc && '('}
-                  {sol.penalty
-                    ? formatTime(sol.time, sol.penalty)
-                    : formatTime(sol.time)}
-                  {session.solves.indexOf(sol) === session.bavg5loc + 4 && ')'}
-                  {session.solves.indexOf(sol) === session.bavg12loc + 11 &&
-                    ']'}
-                  {session.solves.indexOf(sol) === session.bavg50loc + 49 &&
-                    '}'}
-                  {session.solves.indexOf(sol) === session.bavg100loc + 99 &&
-                    '>'}
-                  {session.solves.indexOf(sol) !== session.solves.length - 1 &&
-                    ', '}
-                </span>
-              ))
-            ) : (
-              <p>There are currently no solves in this session. </p>
-            )}
-          </div>
+          <Stats
+            bmo3={bmo3}
+            cmo3={cmo3}
+            bavg5={bavg5}
+            cavg5={cavg5}
+            bavg12={bavg12}
+            cavg12={cavg12}
+            best={best}
+            worst={worst}
+            formatTime={formatTime}
+          />
         </div>
       </div>
       <Chat socket={socket} />
@@ -463,12 +495,10 @@ CompeteTimer.propTypes = {
   clearSession: PropTypes.func.isRequired,
   addSolve: PropTypes.func.isRequired,
   addPenalty: PropTypes.func.isRequired,
-  deleteSolve: PropTypes.func.isRequired,
   updateStats: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   leaveRoom: PropTypes.func.isRequired,
   setRoom: PropTypes.func.isRequired,
-  joinedRoom: PropTypes.func.isRequired,
   getStats: PropTypes.func.isRequired,
   solve: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
@@ -489,11 +519,9 @@ export default connect(mapStateToProps, {
   clearSession,
   addSolve,
   addPenalty,
-  deleteSolve,
   updateStats,
   getCurrentProfile,
   leaveRoom,
   setRoom,
-  joinedRoom,
   getStats,
 })(CompeteTimer);

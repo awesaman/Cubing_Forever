@@ -57,11 +57,11 @@ export const receiveMessage = msg => dispatch => {
 
 // Gets solving statistics about other users in the room
 export const getStats = (username, session) => dispatch => {
-  // let session = stor)e.getState().solve.session;
+  // let session = store.getState().solve.session;
   try {
     dispatch({
       type: GET_STATS,
-      payload: { ...store.getState().room.users, [username]: session },
+      payload: { ...store.getState().room.stats, [username]: session },
     });
   } catch (err) {
     dispatch({
@@ -72,21 +72,21 @@ export const getStats = (username, session) => dispatch => {
 };
 
 // Add users to your list of people
-export const joinedRoom = user => dispatch => {
-  const u = { [user]: {} };
-  console.log(u);
-  try {
-    dispatch({
-      type: JOIN_ROOM,
-      payload: [...store.getState().room.users, u],
-    });
-  } catch (err) {
-    dispatch({
-      type: ROOM_ERROR,
-      payload: err,
-    });
-  }
-};
+// export const joinedRoom = user => dispatch => {
+//   const u = { [user]: {} };
+//   console.log(u);
+//   try {
+//     dispatch({
+//       type: JOIN_ROOM,
+//       payload: [...store.getState().room.users, u],
+//     });
+//   } catch (err) {
+//     dispatch({
+//       type: ROOM_ERROR,
+//       payload: err,
+//     });
+//   }
+// };
 
 // Set Room ID
 export const setRoom = id => dispatch => {

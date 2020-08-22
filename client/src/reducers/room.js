@@ -2,7 +2,6 @@ import {
   ROOM_ERROR,
   CREATE_ROOM,
   LEAVE_ROOM,
-  JOIN_ROOM,
   SET_ROOM,
   GET_STATS,
   RECEIVE_MESSAGE,
@@ -11,8 +10,10 @@ import {
 const initialState = {
   roomID: '',
   isHost: false,
-  users: [],
+  stats: [],
   chats: [],
+  scramble: '',
+  event: '',
 };
 
 export default function (state = initialState, action) {
@@ -30,7 +31,7 @@ export default function (state = initialState, action) {
         ...state,
         roomID: payload,
         chats: [],
-        users: [],
+        stats: [],
         isHost: false,
       };
     case SET_ROOM:
@@ -38,15 +39,10 @@ export default function (state = initialState, action) {
         ...state,
         roomID: payload,
       };
-    case JOIN_ROOM:
-      return {
-        ...state,
-        users: payload,
-      };
     case GET_STATS:
       return {
         ...state,
-        users: payload,
+        stats: payload,
       };
     case RECEIVE_MESSAGE:
       return {
