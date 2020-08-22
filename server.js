@@ -60,6 +60,12 @@ io.on('connection', socket => {
   socket.on('event scramble', (event, scramble, socketID) => {
     socket.to(socketID).emit('get both', event, scramble);
   });
+  socket.on('host left', roomID => {
+    socket.to(roomID).emit('host open');
+  });
+  socket.on('new host', roomID => {
+    socket.to(roomID).emit('host closed');
+  });
 });
 
 const PORT = process.env.PORT || 5000;

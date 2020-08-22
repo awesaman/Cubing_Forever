@@ -15,7 +15,7 @@ const Rooms = ({ createRoom, room }) => {
           cubers!
         </p>
 
-        <button onClick={createRoom} className='btn btn-success'>
+        <button onClick={() => createRoom('')} className='btn btn-success'>
           Create New Room
         </button>
 

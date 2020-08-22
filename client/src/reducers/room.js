@@ -7,6 +7,7 @@ import {
   RECEIVE_MESSAGE,
   SET_EVENT,
   SET_SCRAMBLE,
+  SET_HOST,
 } from '../actions/types';
 
 const initialState = {
@@ -33,11 +34,16 @@ export default function (state = initialState, action) {
     case LEAVE_ROOM:
       return {
         ...state,
-        roomID: payload.roomID,
+        roomID: '',
         chats: [],
         stats: [],
         isHost: false,
-        hostPresent: payload.hostPresent,
+        hostPresent: payload,
+      };
+    case SET_HOST:
+      return {
+        ...state,
+        hostPresent: payload,
       };
     case SET_ROOM:
       return {

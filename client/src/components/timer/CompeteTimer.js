@@ -17,9 +17,11 @@ import { getCurrentProfile } from '../../actions/profile';
 import {
   leaveRoom,
   getStats,
+  setHost,
   setRoom,
   setRoomEvent,
   setRoomScramble,
+  createRoom,
 } from '../../actions/room';
 import Chat from './Chat';
 import PropTypes from 'prop-types';
@@ -36,6 +38,8 @@ const CompeteTimer = ({
   updateStats,
   getCurrentProfile,
   leaveRoom,
+  createRoom,
+  setHost,
   setRoom,
   setRoomEvent,
   setRoomScramble,
@@ -47,12 +51,14 @@ const CompeteTimer = ({
 }) => {
   // state
   const [event, setEvent] = useState('3x3');
-  const [scramble, setScramble] = useState('Host has not started the session');
+  const [scramble, setScramble] = useState(
+    'Host has not generated any scrambles yet'
+  );
   const [inspection, toggleInspection] = useState(false);
   const [time, setTime] = useState({ cs: 0, s: 0, m: 0, h: 0 });
   const [repeater, setRepeater] = useState();
   const [penalty, setPenalty] = useState('');
-  const [status, setStatus] = useState('ready');
+  const [status, setStatus] = useState('waiting');
   const [green, setGreen] = useState(false);
   const [bmo3, setbmo3] = useState(false);
   const [cmo3, setcmo3] = useState(false);
@@ -140,24 +146,20 @@ const CompeteTimer = ({
     socket.emit('new scramble', room.roomID, final_scramble);
     setRoomScramble(final_scramble);
     setScramble(final_scramble);
+    setStatus('ready');
   };
 
   // handle pressing the spacebar
   const handleUp = () => {
-    if (scramble !== room.scramble) {
-      if (status === 'ready') inspection ? inspect() : start();
-      if (status === 'inspecting' || status === '+2' || status === 'DNF')
-        start();
-      if (status === 'stopped') setStatus('ready');
-      setGreen(false);
-    }
+    if (status === 'ready') inspection ? inspect() : start();
+    if (status === 'inspecting' || status === '+2' || status === 'DNF') start();
+    if (status === 'stopped') setStatus('waiting');
+    setGreen(false);
   };
 
   const handleDown = () => {
-    if (scramble !== room.scramble) {
-      if (status === 'started') stop();
-      else setGreen(true);
-    }
+    if (status === 'started') stop();
+    else if (status !== 'waiting') setGreen(true);
   };
 
   // general helpful functions
@@ -215,6 +217,20 @@ const CompeteTimer = ({
     await getSession(event);
   };
 
+  const leavingRoom = () => {
+    if (room.isHost) {
+      socket.emit('host left', room.roomID);
+    }
+    leaveRoom();
+  };
+
+  const hostRoom = () => {
+    socket.emit('new host', room.roomID);
+    createRoom(room.roomID);
+    socket.emit('new event', room.roomID, event);
+    setRoomEvent(event);
+  };
+
   // functions to run when state changes
   useEffect(() => {
     if (!profile) getCurrentProfile();
@@ -223,6 +239,9 @@ const CompeteTimer = ({
     if (room.isHost) {
       socket.emit('new event', room.roomID, event);
       setRoomEvent(event);
+      setRoomScramble('Host has not generated any scrambles yet');
+      setScramble('Host has not generated any scrambles yet');
+      setStatus('waiting'); // not sure
     }
   }, [event, loading]);
 
@@ -296,6 +315,9 @@ const CompeteTimer = ({
 
     socket.on('get scramble', scramble => {
       setRoomScramble(scramble);
+      setScramble(scramble);
+      if (scramble !== 'Host has not generated any scrambles yet')
+        setStatus('ready');
     });
 
     socket.on('get event', event => {
@@ -305,6 +327,15 @@ const CompeteTimer = ({
     socket.on('get both', (event, scramble) => {
       setRoomEvent(event);
       setRoomScramble(scramble);
+      setScramble(scramble);
+      if (scramble !== 'Host has not generated any scrambles yet')
+        setStatus('ready');
+    });
+    socket.on('host open', () => {
+      setHost(false);
+    });
+    socket.on('host closed', () => {
+      setHost(true);
     });
   }, []);
 
@@ -380,6 +411,11 @@ const CompeteTimer = ({
                 Next Scramble
               </button>
             )}
+            {!room.hostPresent && !room.isHost && (
+              <button className='btn btn-success btn-small' onClick={hostRoom}>
+                Host Room
+              </button>
+            )}
             {session.solves && session.solves.length !== 0 && (
               <button className='btn btn-light btn-small' onClick={clearSolves}>
                 Clear Session
@@ -394,7 +430,7 @@ const CompeteTimer = ({
             <Link
               to='/compete'
               className='btn btn-danger btn-small'
-              onClick={leaveRoom}
+              onClick={leavingRoom}
             >
               Leave Room
             </Link>
@@ -506,8 +542,8 @@ const CompeteTimer = ({
           {status === '+2' && <h1 className='XL red'>+2</h1>}
           {status === 'DNF' && <h1 className='XL red'>DNF</h1>}
           <p>Scramble: {room && room.scramble}</p>
-          {room && room.isHost === false && scramble === room.scramble && (
-            <p>Waiting for next scramble...</p>
+          {room && room.isHost === false && status === 'waiting' && (
+            <p>Waiting for the next scramble...</p>
           )}
         </div>
         <div className='solves stats-table'>
@@ -540,6 +576,8 @@ CompeteTimer.propTypes = {
   updateStats: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   leaveRoom: PropTypes.func.isRequired,
+  createRoom: PropTypes.func.isRequired,
+  setHost: PropTypes.func.isRequired,
   setRoom: PropTypes.func.isRequired,
   setRoomEvent: PropTypes.func.isRequired,
   setRoomScramble: PropTypes.func.isRequired,
@@ -566,6 +604,8 @@ export default connect(mapStateToProps, {
   updateStats,
   getCurrentProfile,
   leaveRoom,
+  createRoom,
+  setHost,
   setRoom,
   setRoomEvent,
   setRoomScramble,

@@ -8,12 +8,14 @@ import {
   GET_STATS,
   SET_SCRAMBLE,
   SET_EVENT,
+  SET_HOST,
 } from './types';
 import v4 from 'uuid';
 import store from '../store';
 
 // Create a room
-export const createRoom = (id = v4()) => dispatch => {
+export const createRoom = id => dispatch => {
+  if (id === '') id = v4();
   try {
     dispatch({
       type: CREATE_ROOM,
@@ -29,10 +31,12 @@ export const createRoom = (id = v4()) => dispatch => {
 
 // Leave a room
 export const leaveRoom = () => dispatch => {
+  let hostPresent = true;
+  if (store.getState().room.isHost) hostPresent = false;
   try {
     dispatch({
       type: LEAVE_ROOM,
-      payload: '',
+      payload: hostPresent,
     });
   } catch (err) {
     dispatch({
@@ -120,12 +124,27 @@ export const setRoomEvent = event => dispatch => {
   }
 };
 
-// Set Room ID
+// Set Room Scramble
 export const setRoomScramble = scramble => dispatch => {
   try {
     dispatch({
       type: SET_SCRAMBLE,
       payload: scramble,
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
+};
+
+// Set Room Host
+export const setHost = hostPresent => dispatch => {
+  try {
+    dispatch({
+      type: SET_HOST,
+      payload: hostPresent,
     });
   } catch (err) {
     dispatch({

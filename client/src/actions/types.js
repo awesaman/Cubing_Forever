@@ -24,6 +24,7 @@ export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
 export const CREATE_ROOM = 'CREATE_ROOM';
 export const GET_STATS = 'GET_STATS';
 export const JOIN_ROOM = 'JOIN_ROOM';
+export const SET_HOST = 'SET_HOST';
 export const SET_ROOM = 'SET_ROOM';
 export const SET_EVENT = 'SET_EVENT';
 export const SET_SCRAMBLE = 'SET_SCRAMBLE';
