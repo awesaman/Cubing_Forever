@@ -3,7 +3,7 @@ const app = express();
 const connectDB = require('./config/db');
 const cors = require('cors');
 const server = require('http').createServer(app);
-const io = require('socket.io')(server, { wsEngine: 'ws' });
+const io = require('socket.io')(server, { wsEngine: 'ws', forceNew: true });
 
 connectDB();
 
@@ -19,16 +19,11 @@ app.use('/api/profile', require('./routes/api/profile'));
 io.on('connection', socket => {
   socket.on('join room', (roomID, socketID, info) => {
     socket.join(roomID);
-    // // var clients = io.sockets.clients(roomID);
-    // io.of('/')
-    //   .in(roomID)
-    //   .clients(function (error, clients) {
-    //     // console.log(clients);
-    //     // console.log(sID);
-    //     // io.clients[sID].send()
-    //     socket.to(socketId).emit('give users', clients);
-    //   });
     socket.to(roomID).emit('user connected', socketID, info);
+  });
+  socket.on('leave room', (roomID, info) => {
+    socket.leave(roomID);
+    socket.to(roomID).emit('user left', info);
   });
   socket.on('input message', (roomID, msg) => {
     socket.to(roomID).emit('output message', msg);

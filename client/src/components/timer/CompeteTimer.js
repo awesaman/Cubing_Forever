@@ -1,5 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Link, Redirect } from 'react-router-dom';
+import { useLocation } from 'react-router';
+import { createBrowserHistory } from 'history';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
@@ -19,7 +21,6 @@ import {
   getStats,
   setHost,
   setStats,
-  setRoom,
   setRoomEvent,
   setRoomScramble,
   createRoom,
@@ -41,7 +42,6 @@ const CompeteTimer = ({
   leaveRoom,
   createRoom,
   setHost,
-  setRoom,
   setRoomEvent,
   setRoomScramble,
   setStats,
@@ -71,6 +71,8 @@ const CompeteTimer = ({
   const [best, setbest] = useState(true);
   const [worst, setworst] = useState(true);
   const [myStats, setMyStats] = useState([]);
+  let location = useLocation();
+  let history = createBrowserHistory();
 
   // variables for time
   var newcs = time.cs,
@@ -220,11 +222,18 @@ const CompeteTimer = ({
     await getSession(event);
   };
 
-  const leavingRoom = () => {
+  const leavingRoom = async () => {
     if (room.isHost) {
       socket.emit('host left', room.roomID);
     }
-    leaveRoom();
+    socket.emit('leave room', room.roomID, {
+      special: true,
+      text: 'LEFT THE ROOM',
+      username: user.username,
+      avatar: user.avatar,
+      timestamp: moment().format('hh:mm a'),
+    });
+    await leaveRoom();
   };
 
   const hostRoom = () => {
@@ -270,9 +279,24 @@ const CompeteTimer = ({
     }
   }, [room.stats]);
 
+  // useEffect(() => {
+  //   let url = location.pathname.split('/');
+  //   console.log(url[url.length - 2]);
+  //   if (url[url.length - 2] !== 'compete') leavingRoom();
+  // }, [location]);
+
   useEffect(() => {
     if (!profile) getCurrentProfile();
     getStats(user.username, session);
+
+    history.listen(location => {
+      let url = location.pathname.split('/');
+      if (url[url.length - 2] !== 'compete') leavingRoom();
+    });
+    // let url = window.location.href.split('/');
+    // if (room.roomID !== url[url.length - 1]) {
+    //   room.roomID = url[url.length - 1];
+    // }
 
     // if (room.roomID === '') {
     //   let url = window.location.href.split('/');
@@ -285,7 +309,7 @@ const CompeteTimer = ({
     // }
 
     socket.emit('join room', room.roomID, socket.id, {
-      first: true,
+      special: true,
       text: 'JOINED THE ROOM',
       username: user.username,
       avatar: user.avatar,
@@ -312,7 +336,6 @@ const CompeteTimer = ({
       setRoomScramble(scramble);
       setScramble(scramble);
       setStats(stats);
-      console.log('fired');
       if (scramble !== 'Host has not generated any scrambles yet')
         setStatus('ready');
     });
@@ -376,6 +399,7 @@ const CompeteTimer = ({
                   !profile.events.map(ev => ev.name).includes(room.event) && (
                     <Fragment>
                       {console.log(profile)}
+                      {console.log(room.event)}
                       {window.alert(
                         'This event is not in your profile. Please add it to your profile and return to the room.'
                       )}
@@ -566,7 +590,6 @@ CompeteTimer.propTypes = {
   leaveRoom: PropTypes.func.isRequired,
   createRoom: PropTypes.func.isRequired,
   setHost: PropTypes.func.isRequired,
-  setRoom: PropTypes.func.isRequired,
   setRoomEvent: PropTypes.func.isRequired,
   setRoomScramble: PropTypes.func.isRequired,
   setStats: PropTypes.func.isRequired,
@@ -595,7 +618,6 @@ export default connect(mapStateToProps, {
   leaveRoom,
   createRoom,
   setHost,
-  setRoom,
   setRoomEvent,
   setRoomScramble,
   setStats,

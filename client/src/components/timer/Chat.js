@@ -27,12 +27,16 @@ const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
   };
 
   useEffect(() => {
-    if (room.roomID === '') {
-      let url = window.location.href.split('/');
+    let url = window.location.href.split('/');
+    if (room.roomID !== url[url.length - 1]) {
       room.roomID = url[url.length - 1];
     }
 
     socket.on('user connected', (socketID, msg) => {
+      receiveMessage(msg);
+    });
+
+    socket.on('user left', msg => {
       receiveMessage(msg);
     });
 
@@ -60,7 +64,7 @@ const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
                 />
                 <div>
                   <small className='text-light'>{chat.username}</small>
-                  <p className={chat.first ? 'text-light' : 'text-primary'}>
+                  <p className={chat.special ? 'text-light' : 'text-primary'}>
                     {chat.text}
                   </p>
                 </div>

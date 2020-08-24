@@ -38,12 +38,15 @@ export default function (state = initialState, action) {
         roomID: '',
         chats: [],
         stats: [],
+        event: '',
+        scramble: '',
         isHost: false,
         hostPresent: payload,
       };
     case SET_HOST:
       return {
         ...state,
+        isHost: payload,
         hostPresent: payload,
       };
     case SET_ROOM:
