@@ -57,12 +57,14 @@ io.on('connection', socket => {
     socket.to(roomID).emit('get event', event);
   });
 
-  socket.on('event scramble', (event, scramble, socketID) => {
-    socket.to(socketID).emit('get both', event, scramble);
+  socket.on('send room info', (event, scramble, stats, socketID) => {
+    socket.to(socketID).emit('get room info', event, scramble, stats);
   });
+
   socket.on('host left', roomID => {
     socket.to(roomID).emit('host open');
   });
+
   socket.on('new host', roomID => {
     socket.to(roomID).emit('host closed');
   });

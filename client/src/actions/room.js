@@ -3,9 +3,10 @@ import {
   CREATE_ROOM,
   LEAVE_ROOM,
   JOIN_ROOM,
-  SET_ROOM,
   RECEIVE_MESSAGE,
   GET_STATS,
+  SET_STATS,
+  SET_ROOM,
   SET_SCRAMBLE,
   SET_EVENT,
   SET_HOST,
@@ -63,11 +64,25 @@ export const receiveMessage = msg => dispatch => {
 
 // Gets solving statistics about other users in the room
 export const getStats = (username, session) => dispatch => {
-  // let session = store.getState().solve.session;
   try {
     dispatch({
       type: GET_STATS,
       payload: { ...store.getState().room.stats, [username]: session },
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
+};
+
+// Gets solving statistics about other users in the room
+export const setStats = stats => dispatch => {
+  try {
+    dispatch({
+      type: SET_STATS,
+      payload: stats,
     });
   } catch (err) {
     dispatch({

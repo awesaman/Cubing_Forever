@@ -25,7 +25,6 @@ const ProfileForm = ({
   profile: { profile, loading },
   createProfile,
   getCurrentProfile,
-  history,
 }) => {
   // state
   const [formData, setFormData] = useState(initialState);
@@ -72,15 +71,9 @@ const ProfileForm = ({
 
   const onSubmit = e => {
     e.preventDefault();
-    createProfile(formData, history, profile ? true : false);
+    createProfile(formData, profile ? true : false);
     if (editEvent === 'new') addEvent();
     else if (editEvent !== null) modifyEvent(name);
-    close();
-  };
-
-  const onSubmitEvent = e => {
-    e.preventDefault();
-    createProfile(formData, history, profile ? true : false);
     close();
   };
 

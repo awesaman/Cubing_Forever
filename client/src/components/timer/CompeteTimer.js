@@ -1,7 +1,7 @@
-import React, { Fragment, useState, useEffect, useRef } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import eventNaming from '../../utils/eventNaming.json';
-import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
+import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
 import moment from 'moment';
 import Stats from './Stats';
@@ -18,6 +18,7 @@ import {
   leaveRoom,
   getStats,
   setHost,
+  setStats,
   setRoom,
   setRoomEvent,
   setRoomScramble,
@@ -43,6 +44,7 @@ const CompeteTimer = ({
   setRoom,
   setRoomEvent,
   setRoomScramble,
+  setStats,
   getStats,
   room,
   auth: { user },
@@ -68,6 +70,7 @@ const CompeteTimer = ({
   const [cavg12, setcavg12] = useState(false);
   const [best, setbest] = useState(true);
   const [worst, setworst] = useState(true);
+  const [myStats, setMyStats] = useState([]);
 
   // variables for time
   var newcs = time.cs,
@@ -165,7 +168,7 @@ const CompeteTimer = ({
   // general helpful functions
   const formatTime = (num, penalty = null) => {
     if (typeof num !== 'number') return num;
-    num = Math.floor(100 * num) / 100;
+    num = Math.round(100 * num) / 100;
     let h = Math.floor(num / 3600);
     let m = Math.floor((num - h * 60) / 60);
     let s = Math.floor(num - 3600 * h - m * 60);
@@ -241,7 +244,7 @@ const CompeteTimer = ({
       setRoomEvent(event);
       setRoomScramble('Host has not generated any scrambles yet');
       setScramble('Host has not generated any scrambles yet');
-      setStatus('waiting'); // not sure
+      setStatus('waiting');
     }
   }, [event, loading]);
 
@@ -249,6 +252,7 @@ const CompeteTimer = ({
     if (penalty !== '')
       addPenalty(event, session.solves[session.solves.length - 1]._id, penalty);
     setPenalty('');
+    getStats(user.username, session);
     setScramble(scramble);
     socket.emit('solved', room.roomID, user.username, session);
   }, [session.solves]);
@@ -257,49 +261,28 @@ const CompeteTimer = ({
     if (status === '+2') setPenalty('+2');
     if (status === 'DNF') setPenalty('DNF');
   }, [status]);
-  // useEffect(() => {
-  //   socket.name = profile.user.username;
-  // }, [profile]);
-  //     socket.emit('join room', room.roomID, {
-  //       first: true,
-  //       text: 'JOINED THE ROOM',
-  //       username: profile.user.username,
-  //       avatar: profile.user.avatar,
-  //       timestamp: moment().format('hh:mm a'),
-  //     });
+
+  useEffect(() => {
+    if (room.isHost) {
+      socket.on('user connected', socketID => {
+        socket.emit('send room info', event, scramble, room.stats, socketID);
+      });
+    }
+  }, [room.stats]);
 
   useEffect(() => {
     if (!profile) getCurrentProfile();
+    getStats(user.username, session);
 
-    if (room.roomID === '') {
-      let url = window.location.href.split('/');
-      setRoom(url[url.length - 1]);
-    }
-    // if (!profile) getCurrentProfile();
-    // if (profile) {
-    //   console.log('reach');
-    //   socket.name = profile.user.username;
-    //   socket.emit('join room', room.roomID, {
-    //     first: true,
-    //     text: 'JOINED THE ROOM',
-    //     username: profile.user.username,
-    //     avatar: profile.user.avatar,
-    //     timestamp: moment().format('hh:mm a'),
+    // if (room.roomID === '') {
+    //   let url = window.location.href.split('/');
+    //   setRoom(url[url.length - 1]);
+    // }
+    // if (room.isHost) {
+    //   socket.on('user connected', socketID => {
+    //     socket.emit('send room info', event, scramble, room.stats, socketID);
     //   });
     // }
-    // socket.on('names', username => {
-    //   console.log('nice');
-    //   joinedRoom(username);
-    // });
-    if (room.isHost) {
-      socket.on('user connected', socketID => {
-        socket.emit('event scramble', event, scramble, socketID);
-      });
-    }
-    // socket.on('final', username => {
-    //   console.log('nice');
-    //   joinedRoom(username);
-    // });
 
     socket.emit('join room', room.roomID, socket.id, {
       first: true,
@@ -324,16 +307,20 @@ const CompeteTimer = ({
       setRoomEvent(event);
     });
 
-    socket.on('get both', (event, scramble) => {
+    socket.on('get room info', (event, scramble, stats) => {
       setRoomEvent(event);
       setRoomScramble(scramble);
       setScramble(scramble);
+      setStats(stats);
+      console.log('fired');
       if (scramble !== 'Host has not generated any scrambles yet')
         setStatus('ready');
     });
+
     socket.on('host open', () => {
       setHost(false);
     });
+
     socket.on('host closed', () => {
       setHost(true);
     });
@@ -517,6 +504,7 @@ const CompeteTimer = ({
         <div>
           {(status === 'stopped' ||
             status === 'started' ||
+            status === 'waiting' ||
             status === 'ready') && (
             <h1 className={green ? 'XL green' : 'XL'}>
               {time.h > 0 && (
@@ -543,7 +531,7 @@ const CompeteTimer = ({
           {status === 'DNF' && <h1 className='XL red'>DNF</h1>}
           <p>Scramble: {room && room.scramble}</p>
           {room && room.isHost === false && status === 'waiting' && (
-            <p>Waiting for the next scramble...</p>
+            <p className='S'>Waiting for the next scramble...</p>
           )}
         </div>
         <div className='solves stats-table'>
@@ -581,6 +569,7 @@ CompeteTimer.propTypes = {
   setRoom: PropTypes.func.isRequired,
   setRoomEvent: PropTypes.func.isRequired,
   setRoomScramble: PropTypes.func.isRequired,
+  setStats: PropTypes.func.isRequired,
   getStats: PropTypes.func.isRequired,
   solve: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
@@ -609,5 +598,6 @@ export default connect(mapStateToProps, {
   setRoom,
   setRoomEvent,
   setRoomScramble,
+  setStats,
   getStats,
 })(CompeteTimer);

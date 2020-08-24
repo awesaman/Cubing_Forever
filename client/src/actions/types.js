@@ -23,6 +23,7 @@ export const SOLVE_ERROR = 'SOLVE_ERROR';
 export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
 export const CREATE_ROOM = 'CREATE_ROOM';
 export const GET_STATS = 'GET_STATS';
+export const SET_STATS = 'SET_STATS';
 export const JOIN_ROOM = 'JOIN_ROOM';
 export const SET_HOST = 'SET_HOST';
 export const SET_ROOM = 'SET_ROOM';

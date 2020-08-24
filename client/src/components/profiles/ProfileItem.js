@@ -37,14 +37,16 @@ const ProfileItem = ({
         <Link to={`/profile/${_id}`} className='btn btn-primary'>
           View Profile
         </Link>
-        <a
-          href={`https://www.worldcubeassociation.org/persons/${wcaid}`}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='btn btn-light'
-        >
-          View WCA Profile
-        </a>
+        {wcaid && (
+          <a
+            href={`https://www.worldcubeassociation.org/persons/${wcaid}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='btn btn-light'
+          >
+            View WCA Profile
+          </a>
+        )}
       </div>
     </div>
   );

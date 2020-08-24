@@ -8,6 +8,7 @@ import {
   SET_EVENT,
   SET_SCRAMBLE,
   SET_HOST,
+  SET_STATS,
 } from '../actions/types';
 
 const initialState = {
@@ -50,6 +51,7 @@ export default function (state = initialState, action) {
         ...state,
         roomID: payload,
       };
+    case SET_STATS:
     case GET_STATS:
       return {
         ...state,

@@ -63,11 +63,7 @@ export const getProfileById = userId => async dispatch => {
 };
 
 // Create or update profile
-export const createProfile = (
-  formData,
-  history,
-  edit = false
-) => async dispatch => {
+export const createProfile = (formData, edit = false) => async dispatch => {
   try {
     const res = await api.post('/profile', formData);
 
@@ -79,10 +75,6 @@ export const createProfile = (
     dispatch(
       showAlert(edit ? 'Profile Updated' : 'Profile Created', 'success')
     );
-
-    if (!edit) {
-      history.push('/dashboard');
-    }
   } catch (err) {
     const errors = err.response.data.errors;
 

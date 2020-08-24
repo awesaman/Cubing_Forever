@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { receiveMessage } from '../../actions/room';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import io from 'socket.io-client';
 let chatbox;
 
 const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
@@ -32,22 +31,6 @@ const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
       let url = window.location.href.split('/');
       room.roomID = url[url.length - 1];
     }
-    // var socketConnection = io.connect();
-    // var sID;
-    // socketConnection.on('connect', () => {
-    //   sID = socketConnection.socket.sessionid;
-    // });
-    // socket.on('send back', socketID => {
-    //   socket.emit('user info', socketID, user.username); //might need to be backend code
-    // });
-    // socket.name = user.username;
-    // socket.emit('join room', room.roomID, {
-    //   first: true,
-    //   text: 'JOINED THE ROOM',
-    //   username: user.username,
-    //   avatar: user.avatar,
-    //   timestamp: moment().format('hh:mm a'),
-    // });
 
     socket.on('user connected', (socketID, msg) => {
       receiveMessage(msg);

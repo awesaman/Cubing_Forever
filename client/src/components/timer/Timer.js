@@ -1,6 +1,6 @@
-import React, { Fragment, useState, useEffect, useRef } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import eventNaming from '../../utils/eventNaming.json';
-import { Scrambow } from '/Users/aman/Documents/CODE/MERN/CubingForever/client/node_modules/scrambow/dist/scrambow';
+import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
 import {
   getSession,
@@ -12,7 +12,6 @@ import {
   updateStats,
 } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
-import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -133,7 +132,7 @@ const Timer = ({
   // general helpful functions
   const formatTime = (num, penalty = null) => {
     if (typeof num !== 'number') return num;
-    num = Math.floor(100 * num) / 100;
+    num = Math.round(100 * num) / 100;
     let h = Math.floor(num / 3600);
     let m = Math.floor((num - h * 60) / 60);
     let s = Math.floor(num - 3600 * h - m * 60);
@@ -167,10 +166,10 @@ const Timer = ({
     setDisplaySolve(-1);
   };
 
-  const removeSolve = () => {
-    deleteSolve(event, session.solves[displaySolve]._id);
-    setDisplaySolve(displaySolve - 1);
-    updateStats(event);
+  const removeSolve = async () => {
+    await setDisplaySolve(displaySolve - 1);
+    await deleteSolve(event, session.solves[displaySolve]._id);
+    await updateStats(event);
   };
 
   const plus2 = async () => {
@@ -204,7 +203,6 @@ const Timer = ({
     if (session.solves && session.solves.length > 0)
       setDisplaySolve(session.solves.length - 1);
     else setDisplaySolve(-1);
-    generateScramble();
     if (penalty !== '')
       addPenalty(event, session.solves[session.solves.length - 1]._id, penalty);
     setPenalty('');
@@ -213,6 +211,7 @@ const Timer = ({
   useEffect(() => {
     if (status === '+2') setPenalty('+2');
     if (status === 'DNF') setPenalty('DNF');
+    if (status === 'ready') generateScramble();
   }, [status]);
 
   useSpace('keyup', handleUp);
