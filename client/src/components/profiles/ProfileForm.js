@@ -292,7 +292,7 @@ const ProfileForm = ({
         <p className='M'>Events</p>
         {formData.events &&
           formData.events.map(event => (
-            <Fragment>
+            <Fragment key={event._id}>
               <div className='event-display'>
                 <div className='event-main'>
                   <img

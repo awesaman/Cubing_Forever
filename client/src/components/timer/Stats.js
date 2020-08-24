@@ -13,10 +13,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 const useStyles = makeStyles({
-  table: {
-    // minWidth: 650,
-    // overflowX: auto,
-  },
   scrollable: {
     minWidth: 200,
     maxHeight: 20,
@@ -48,7 +44,7 @@ const Stats = ({
 
   return (
     <TableContainer className={classes.tablecontainer} component={Paper}>
-      <Table className={classes.table} size='small' aria-label='a dense table'>
+      <Table size='small' aria-label='a dense table'>
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>

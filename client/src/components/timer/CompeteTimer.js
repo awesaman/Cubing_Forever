@@ -347,6 +347,10 @@ const CompeteTimer = ({
     socket.on('host closed', () => {
       setHost(true);
     });
+
+    return function cleanup() {
+      leavingRoom();
+    };
   }, []);
 
   useSpace('keyup', handleUp);
@@ -467,40 +471,52 @@ const CompeteTimer = ({
               )}
             <div className='checkboxes'>
               <div className='bubble-group'>
-                <div
-                  className='bubble'
-                  style={cmo3 ? { backgroundColor: '#bbb' } : {}}
-                  onClick={() => setcmo3(!cmo3)}
-                />
-                Mean 3
-                <div
-                  className='bubble'
-                  style={bmo3 ? { backgroundColor: '#bbb' } : {}}
-                  onClick={() => setbmo3(!bmo3)}
-                />
-                Best Mean 3
+                <div>
+                  <div
+                    className='bubble'
+                    style={cmo3 ? { backgroundColor: '#bbb' } : {}}
+                    onClick={() => setcmo3(!cmo3)}
+                  />
+                  Mean 3
+                </div>
+                <div>
+                  <div
+                    className='bubble'
+                    style={bmo3 ? { backgroundColor: '#bbb' } : {}}
+                    onClick={() => setbmo3(!bmo3)}
+                  />
+                  Best Mean 3
+                </div>
               </div>
               <div className='bubble-group'>
-                <div
-                  className='bubble'
-                  style={cavg5 ? { backgroundColor: '#bbb' } : {}}
-                  onClick={() => setcavg5(!cavg5)}
-                />{' '}
-                Avg 5
-                <div
-                  className='bubble'
-                  style={bavg5 ? { backgroundColor: '#bbb' } : {}}
-                  onClick={() => setbavg5(!bavg5)}
-                />{' '}
-                Best Avg 5
+                <div>
+                  <div
+                    className='bubble'
+                    style={cavg5 ? { backgroundColor: '#bbb' } : {}}
+                    onClick={() => setcavg5(!cavg5)}
+                  />{' '}
+                  Avg 5
+                </div>
+                <div>
+                  <div
+                    className='bubble'
+                    style={bavg5 ? { backgroundColor: '#bbb' } : {}}
+                    onClick={() => setbavg5(!bavg5)}
+                  />{' '}
+                  Best Avg 5
+                </div>
               </div>
-              <div className='bubble-group'>
+            </div>
+            <div className='bubble-group'>
+              <div>
                 <div
                   className='bubble'
                   style={cavg12 ? { backgroundColor: '#bbb' } : {}}
                   onClick={() => setcavg12(!cavg12)}
                 />{' '}
                 Avg 12
+              </div>
+              <div>
                 <div
                   className='bubble'
                   style={bavg12 ? { backgroundColor: '#bbb' } : {}}
@@ -510,18 +526,22 @@ const CompeteTimer = ({
               </div>
             </div>
             <div className='bubble-group'>
-              <div
-                className='bubble'
-                style={best ? { backgroundColor: '#bbb' } : {}}
-                onClick={() => setbest(!best)}
-              />{' '}
-              Best Single
-              <div
-                className='bubble'
-                style={worst ? { backgroundColor: '#bbb' } : {}}
-                onClick={() => setworst(!worst)}
-              />{' '}
-              Worst
+              <div>
+                <div
+                  className='bubble'
+                  style={best ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setbest(!best)}
+                />{' '}
+                Best Single
+              </div>
+              <div>
+                <div
+                  className='bubble'
+                  style={worst ? { backgroundColor: '#bbb' } : {}}
+                  onClick={() => setworst(!worst)}
+                />{' '}
+                Worst
+              </div>
             </div>
           </div>
         </div>

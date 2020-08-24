@@ -499,6 +499,11 @@ button {
   // background: $primary-color;
 }
 
+.bubble-group {
+  display: flex;
+  justify-content: space-between;
+}
+
 .mobile,
 .reveal {
   display: none;
@@ -567,6 +572,10 @@ button {
   }
 
   .info {
+    flex-direction: column;
+  }
+
+  .bubble-group {
     flex-direction: column;
   }
 }

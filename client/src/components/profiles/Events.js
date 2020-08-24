@@ -6,7 +6,7 @@ const Events = ({ events }) => {
   return (
     <Fragment>
       {events.map(event => (
-        <div className='event-display'>
+        <div key={event._id} className='event-display'>
           <div className='event-main'>
             <img
               src={require(`../../img/events/${eventNaming[event.name]}.svg`)}
