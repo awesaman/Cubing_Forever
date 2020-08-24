@@ -24,6 +24,10 @@ const useStyles = makeStyles({
   },
   smallcol: {
     maxHeight: 20,
+    minWidth: 90,
+  },
+  midcol: {
+    maxHeight: 20,
     minWidth: 120,
   },
 });
@@ -50,22 +54,22 @@ const Stats = ({
             <TableCell>Name</TableCell>
             <TableCell className={classes.scrollable}>Solves</TableCell>
             {cmo3 && (
-              <TableCell className={classes.smallcol}>Curr Mean 3</TableCell>
+              <TableCell className={classes.midcol}>Curr Mean 3</TableCell>
             )}
             {bmo3 && (
-              <TableCell className={classes.smallcol}>Best Mean 3</TableCell>
+              <TableCell className={classes.midcol}>Best Mean 3</TableCell>
             )}
             {cavg5 && (
-              <TableCell className={classes.smallcol}>Curr Avg 5</TableCell>
+              <TableCell className={classes.midcol}>Curr Avg 5</TableCell>
             )}
             {bavg5 && (
-              <TableCell className={classes.smallcol}>Best Avg 5</TableCell>
+              <TableCell className={classes.midcol}>Best Avg 5</TableCell>
             )}
             {cavg12 && (
-              <TableCell className={classes.smallcol}>Curr Avg 12</TableCell>
+              <TableCell className={classes.midcol}>Curr Avg 12</TableCell>
             )}
             {bavg12 && (
-              <TableCell className={classes.smallcol}>Best Avg 12</TableCell>
+              <TableCell className={classes.midcol}>Best Avg 12</TableCell>
             )}
             {best && <TableCell className={classes.smallcol}>Best</TableCell>}
             {worst && <TableCell className={classes.smallcol}>Worst</TableCell>}
@@ -99,32 +103,32 @@ const Stats = ({
                 </TableCell>
               )}
               {cmo3 && (
-                <TableCell className={classes.smallcol}>
+                <TableCell className={classes.midcol}>
                   {formatTime(room.stats[user].cmo3)}
                 </TableCell>
               )}
               {bmo3 && (
-                <TableCell className={classes.smallcol}>
+                <TableCell className={classes.midcol}>
                   {formatTime(room.stats[user].bmo3)}
                 </TableCell>
               )}
               {cavg5 && (
-                <TableCell className={classes.smallcol}>
+                <TableCell className={classes.midcol}>
                   {formatTime(room.stats[user].cavg5)}
                 </TableCell>
               )}
               {bavg5 && (
-                <TableCell className={classes.smallcol}>
+                <TableCell className={classes.midcol}>
                   {formatTime(room.stats[user].bavg5)}
                 </TableCell>
               )}
               {cavg12 && (
-                <TableCell className={classes.smallcol}>
+                <TableCell className={classes.midcol}>
                   {formatTime(room.stats[user].cavg12)}
                 </TableCell>
               )}
               {bavg12 && (
-                <TableCell className={classes.smallcol}>
+                <TableCell className={classes.midcol}>
                   {formatTime(room.stats[user].bavg12)}
                 </TableCell>
               )}

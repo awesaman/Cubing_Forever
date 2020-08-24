@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import { receiveMessage } from '../../actions/room';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import { socket } from '../../utils/socket';
 let chatbox;
 
-const Chat = ({ socket, room, auth: { user }, receiveMessage }) => {
+const Chat = ({ room, auth: { user }, receiveMessage }) => {
   const [message, setMessage] = useState('');
 
   const onChange = e => {

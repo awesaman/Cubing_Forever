@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { createRoom } from '../../actions/room';
+import { socket } from '../../utils/socket';
 
 const Rooms = ({ createRoom, room }) => {
   if (room.roomID !== '') return <Redirect to={`/compete/${room.roomID}`} />;

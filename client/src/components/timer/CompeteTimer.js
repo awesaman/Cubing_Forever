@@ -28,9 +28,8 @@ import {
 import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import io from 'socket.io-client';
+import { socket } from '../../utils/socket';
 
-let socket = io('http://localhost:5000');
 const CompeteTimer = ({
   getSession,
   newSession,
@@ -594,7 +593,7 @@ const CompeteTimer = ({
           />
         </div>
       </div>
-      <Chat socket={socket} />
+      <Chat />
     </Fragment>
   );
 };
