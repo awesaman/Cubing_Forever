@@ -63,6 +63,12 @@ img {
   margin-bottom: 0.2em;
 }
 
+.smaller {
+  font-size: 0.5em;
+  line-height: 1.2;
+  margin-bottom: 0.2em;
+}
+
 .text-center {
   text-align: center;
 }
@@ -502,6 +508,22 @@ button {
 .bubble-group {
   display: flex;
   justify-content: space-between;
+}
+
+.room-info {
+  display: flex;
+}
+
+.room {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 1em;
+  padding-right: 5em;
+  margin: 2em 0;
+  background-color: $gray-color;
+  border-radius: 15px;
+  overflow: wrap;
 }
 
 .mobile,

@@ -1,7 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { useLocation } from 'react-router';
-import { createBrowserHistory } from 'history';
 import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
@@ -69,9 +67,7 @@ const CompeteTimer = ({
   const [cavg12, setcavg12] = useState(false);
   const [best, setbest] = useState(true);
   const [worst, setworst] = useState(true);
-  const [myStats, setMyStats] = useState([]);
-  let location = useLocation();
-  let history = createBrowserHistory();
+  const [rooms, setRooms] = useState([]);
 
   // variables for time
   var newcs = time.cs,
@@ -236,7 +232,7 @@ const CompeteTimer = ({
   };
 
   const hostRoom = () => {
-    socket.emit('new host', room.roomID);
+    socket.emit('new host', room.roomID, user.username);
     createRoom(room.roomID);
     socket.emit('new event', room.roomID, event);
     setRoomEvent(event);
@@ -245,8 +241,20 @@ const CompeteTimer = ({
   // functions to run when state changes
   useEffect(() => {
     if (!profile) getCurrentProfile();
+    if (loading && room.isHost) {
+      socket.emit(
+        'initialize room',
+        room.roomID,
+        user.username,
+        room.event,
+        room.speedrange
+      );
+    }
     getNewSession(event);
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
+  }, [event, loading]);
+
+  useEffect(() => {
     if (room.isHost) {
       socket.emit('new event', room.roomID, event);
       setRoomEvent(event);
@@ -254,7 +262,8 @@ const CompeteTimer = ({
       setScramble('Host has not generated any scrambles yet');
       setStatus('waiting');
     }
-  }, [event, loading]);
+    getNewSession();
+  }, [event]);
 
   useEffect(() => {
     if (penalty !== '')
@@ -273,25 +282,22 @@ const CompeteTimer = ({
   useEffect(() => {
     if (room.isHost) {
       socket.on('user connected', socketID => {
-        socket.emit('send room info', event, scramble, room.stats, socketID);
+        socket.emit(
+          'send room info',
+          event,
+          scramble,
+          room.stats,
+          room.speedrange,
+          socketID
+        );
       });
     }
   }, [room.stats]);
-
-  // useEffect(() => {
-  //   let url = location.pathname.split('/');
-  //   console.log(url[url.length - 2]);
-  //   if (url[url.length - 2] !== 'compete') leavingRoom();
-  // }, [location]);
 
   useEffect(() => {
     if (!profile) getCurrentProfile();
     getStats(user.username, session);
 
-    history.listen(location => {
-      let url = location.pathname.split('/');
-      if (url[url.length - 2] !== 'compete') leavingRoom();
-    });
     // let url = window.location.href.split('/');
     // if (room.roomID !== url[url.length - 1]) {
     //   room.roomID = url[url.length - 1];
@@ -300,11 +306,6 @@ const CompeteTimer = ({
     // if (room.roomID === '') {
     //   let url = window.location.href.split('/');
     //   setRoom(url[url.length - 1]);
-    // }
-    // if (room.isHost) {
-    //   socket.on('user connected', socketID => {
-    //     socket.emit('send room info', event, scramble, room.stats, socketID);
-    //   });
     // }
 
     socket.emit('join room', room.roomID, socket.id, {
@@ -395,7 +396,8 @@ const CompeteTimer = ({
                     className='small-image mright'
                   />
                 </div>
-                <p className='L inline mright smleft'>{room.event}</p>
+                <p className='M inline mright smleft'>{room.event}</p>{' '}
+                {/*add speedrange here*/}
                 {profile &&
                   profile.events &&
                   profile !== null &&

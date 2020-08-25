@@ -16,6 +16,7 @@ const initialState = {
   isHost: false,
   stats: [],
   chats: [],
+  speedrange: 'sub-30',
   scramble: '',
   event: '',
   hostPresent: true,
