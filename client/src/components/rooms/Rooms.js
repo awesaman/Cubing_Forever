@@ -28,7 +28,7 @@ const Rooms = ({ createRoom, room }) => {
           </span>{' '}
           Join a room to compete with other cubers!
         </p>
-        <p>Private Rooms can only be joined via link</p>
+        <p>Private Rooms can only be joined via link for security reasons</p>
 
         <button onClick={() => createRoom('')} className='btn btn-success'>
           Create New Room
@@ -44,7 +44,8 @@ const Rooms = ({ createRoom, room }) => {
             ))
           ) : (
             <p>
-              There are currently no rooms. Feel free to create one yourself!
+              There are currently no public rooms. Feel free to create one
+              yourself!
             </p>
           )}
         </div>
