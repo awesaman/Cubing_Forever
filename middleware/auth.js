@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
-
+require('dotenv').config();
 module.exports = function (req, res, next) {
   // receive token from header
   const token = req.header('x-auth-token');
@@ -12,7 +12,8 @@ module.exports = function (req, res, next) {
 
   // Verify that the token is correct
   try {
-    jwt.verify(token, config.get('JWThiddenkey'), (error, decoded) => {
+    // jwt.verify(token, config.get('JWThiddenkey'), (error, decoded) => {
+    jwt.verify(token, process.env.JWT_KEY, (error, decoded) => {
       if (error) {
         return res
           .status(401)

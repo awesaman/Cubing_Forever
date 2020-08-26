@@ -7,6 +7,7 @@ const gravatar = require('gravatar');
 const normalize = require('normalize-url');
 const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
+require('dotenv').config();
 
 // @route    POST api/user
 // @desc     Register new user
@@ -83,7 +84,8 @@ router.post(
       // login user after registered in DB
       jwt.sign(
         payload,
-        config.get('JWThiddenkey'),
+        // config.get('JWThiddenkey'),
+        process.env.JWT_KEY,
         { expiresIn: '5 days' },
         (err, token) => {
           if (err) throw err;

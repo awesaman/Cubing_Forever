@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth');
 const User = require('../../models/User');
+require('dotenv').config();
 
 // @route    GET api/auth
 // @desc     Get user info by auth token
@@ -65,7 +66,8 @@ router.post(
 
       jwt.sign(
         payload,
-        config.get('JWThiddenkey'),
+        // config.get('JWThiddenkey'),
+        process.env.JWT_KEY,
         { expiresIn: '5 days' },
         (err, token) => {
           if (err) throw err;
