@@ -13,11 +13,12 @@ const RoomItem = ({ room }) => {
           className='event-img'
         />
         <div className='smleft'>
-          <p className='M'>
-            {info.event}, <span className='smaller'> {info.speedrange}</span>
+          <p className='S'>
+            Current Event: {info.event}
+            {info.desc && <p className='smaller'>{info.desc}</p>}
           </p>
           <p className='S'>Host: {info.hostname}</p>
-          <p className='S'># of Cubers: {info.numusers}</p>
+          <p className='S'>Number of Cubers: {info.numusers}</p>
         </div>
       </div>
       <div>

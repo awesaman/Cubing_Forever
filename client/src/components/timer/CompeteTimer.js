@@ -21,6 +21,7 @@ import {
   setStats,
   setRoomEvent,
   setRoomScramble,
+  setRoomDesc,
   createRoom,
 } from '../../actions/room';
 import Chat from './Chat';
@@ -41,6 +42,7 @@ const CompeteTimer = ({
   setHost,
   setRoomEvent,
   setRoomScramble,
+  setRoomDesc,
   setStats,
   getStats,
   room,
@@ -67,7 +69,6 @@ const CompeteTimer = ({
   const [cavg12, setcavg12] = useState(false);
   const [best, setbest] = useState(true);
   const [worst, setworst] = useState(true);
-  const [rooms, setRooms] = useState([]);
 
   // variables for time
   var newcs = time.cs,
@@ -233,7 +234,7 @@ const CompeteTimer = ({
 
   const hostRoom = () => {
     socket.emit('new host', room.roomID, user.username);
-    createRoom(room.roomID);
+    createRoom(room.roomID, room.desc);
     socket.emit('new event', room.roomID, event);
     setRoomEvent(event);
   };
@@ -247,7 +248,8 @@ const CompeteTimer = ({
         room.roomID,
         user.username,
         room.event,
-        room.speedrange
+        room.desc,
+        room.locked
       );
     }
     getNewSession(event);
@@ -287,7 +289,8 @@ const CompeteTimer = ({
           event,
           scramble,
           room.stats,
-          room.speedrange,
+          room.desc,
+          room.locked,
           socketID
         );
       });
@@ -331,9 +334,10 @@ const CompeteTimer = ({
       setRoomEvent(event);
     });
 
-    socket.on('get room info', (event, scramble, stats) => {
+    socket.on('get room info', (event, scramble, stats, desc) => {
       setRoomEvent(event);
       setRoomScramble(scramble);
+      setRoomDesc(desc);
       setScramble(scramble);
       setStats(stats);
       if (scramble !== 'Host has not generated any scrambles yet')
@@ -397,7 +401,6 @@ const CompeteTimer = ({
                   />
                 </div>
                 <p className='M inline mright smleft'>{room.event}</p>{' '}
-                {/*add speedrange here*/}
                 {profile &&
                   profile.events &&
                   profile !== null &&
@@ -613,6 +616,7 @@ CompeteTimer.propTypes = {
   setHost: PropTypes.func.isRequired,
   setRoomEvent: PropTypes.func.isRequired,
   setRoomScramble: PropTypes.func.isRequired,
+  setRoomDesc: PropTypes.func.isRequired,
   setStats: PropTypes.func.isRequired,
   getStats: PropTypes.func.isRequired,
   solve: PropTypes.object.isRequired,
@@ -641,6 +645,7 @@ export default connect(mapStateToProps, {
   setHost,
   setRoomEvent,
   setRoomScramble,
+  setRoomDesc,
   setStats,
   getStats,
 })(CompeteTimer);

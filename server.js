@@ -2,12 +2,19 @@ const express = require('express');
 const app = express();
 const connectDB = require('./config/db');
 const cors = require('cors');
-const { log } = require('console');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { wsEngine: 'ws', forceNew: true });
-
+const bodyParser = require('body-parser');
 connectDB();
 
+app.use(bodyParser.json({ limit: '50mb', extended: true }));
+app.use(
+  bodyParser.urlencoded({
+    limit: '50mb',
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
 app.use(cors());
 app.use(express.json());
 
@@ -18,44 +25,20 @@ app.use('/api/profile', require('./routes/api/profile'));
 
 // Socket Connection
 var rooms = {};
-// var rooms = io.sockets.adapter.rooms;
 io.on('connection', socket => {
   socket.on('join room', (roomID, socketID, info) => {
-    // let room = io.sockets.adapter.rooms[roomID];
-    // let newnum = room === undefined ? 1 : room.length + 1;
     socket.join(roomID);
     socket.to(roomID).emit('user connected', socketID, info);
-    // rooms = { ...rooms, [roomID]: { ...rooms[roomID], numusers: newnum } };
   });
   socket.on('leave room', (roomID, info) => {
-    // let room = io.sockets.adapter.rooms[roomID];
-    // let newnum = room === undefined ? 0 : room.length - 1;
-    // if (newnum === 0) {
-    //   // console.log(newnum);
-    //   // console.log('should be 0 users');
-    //   delete rooms[roomID]; //not working
-    // } else {
-    //   rooms = { ...rooms, [roomID]: { ...rooms[roomID], numusers: newnum } };
     socket.to(roomID).emit('user left', info);
-    // }
     socket.leave(roomID);
-    // console.log('auto: ', io.sockets.adapter.rooms[roomID].length);
   });
+
   socket.on('input message', (roomID, msg) => {
     socket.to(roomID).emit('output message', msg);
   });
-  // socket.on('user info', (socketID, username) => {
-  //   io.to(socketID).emit('final', username);
-  // });
-  // socket.on('give users', (roomID, socketID) => {
-  //   socket.to(roomID).emit('send back', socketID);
-  // console.log('give users');
-  // var clients = io.sockets.adapter.rooms[roomID].sockets;
-  // for (var clientID in clients) {
-  //   var client = io.sockets.connected[clientID].name;
-  //   io.to(socketID).emit('names', client);
-  // }
-  // });
+
   socket.on('solved', (roomID, username, session) => {
     socket.to(roomID).emit('stats', username, session);
   });
@@ -66,17 +49,15 @@ io.on('connection', socket => {
 
   socket.on('new event', (roomID, event) => {
     rooms = { ...rooms, [roomID]: { ...rooms[roomID], event } };
-    // rooms[roomID] = event;
-    // console.log('room: ', rooms[roomID]);
     socket.to(roomID).emit('get event', event);
   });
 
   socket.on(
     'send room info',
-    (event, scramble, stats, speedrange, socketID) => {
+    (event, scramble, stats, desc, locked, socketID) => {
       socket
         .to(socketID)
-        .emit('get room info', event, scramble, stats, speedrange);
+        .emit('get room info', event, scramble, stats, desc, locked);
     }
   );
 
@@ -90,10 +71,10 @@ io.on('connection', socket => {
     socket.to(roomID).emit('host closed');
   });
 
-  socket.on('initialize room', (roomID, hostname, event, speedrange) => {
+  socket.on('initialize room', (roomID, hostname, event, desc, locked) => {
     rooms = {
       ...rooms,
-      [roomID]: { hostname, event, speedrange, numusers: 0 },
+      [roomID]: { hostname, event, desc, locked, numusers: 0 },
     };
   });
 
@@ -103,24 +84,28 @@ io.on('connection', socket => {
     if (update_rooms) {
       for (var roomID in update_rooms) {
         if (
-          rooms[roomID] &&
-          update_rooms[roomID].length > 0 &&
-          rooms[roomID].hostname !== ''
+          rooms[roomID] && // checks its a room we created
+          rooms[roomID].locked !== true && // checks its not a private room
+          rooms[roomID].hostname !== '' // checks it has a host currently
         ) {
-          send_rooms = [
-            ...send_rooms,
-            {
-              [roomID]: {
-                ...rooms[roomID],
-                numusers: update_rooms[roomID].length,
+          if (update_rooms[roomID].length > 0) {
+            send_rooms = [
+              ...send_rooms,
+              {
+                [roomID]: {
+                  ...rooms[roomID],
+                  numusers: update_rooms[roomID].length,
+                },
               },
-            },
-          ];
+            ];
+          } else {
+            // if no users left, delete the room
+            delete rooms[roomID];
+          }
         }
       }
     }
-    // privaterooms =
-    console.log(send_rooms);
+
     socket.emit('send the rooms', send_rooms);
   });
 });

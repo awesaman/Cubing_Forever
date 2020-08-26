@@ -2,12 +2,12 @@ import {
   ROOM_ERROR,
   CREATE_ROOM,
   LEAVE_ROOM,
-  JOIN_ROOM,
   RECEIVE_MESSAGE,
   GET_STATS,
   SET_STATS,
   SET_ROOM,
   SET_SCRAMBLE,
+  SET_DESC,
   SET_EVENT,
   SET_HOST,
 } from './types';
@@ -15,12 +15,12 @@ import v4 from 'uuid';
 import store from '../store';
 
 // Create a room
-export const createRoom = id => dispatch => {
+export const createRoom = (id, desc, locked) => dispatch => {
   if (id === '') id = v4();
   try {
     dispatch({
       type: CREATE_ROOM,
-      payload: id,
+      payload: { id, desc, locked },
     });
   } catch (err) {
     dispatch({
@@ -92,23 +92,6 @@ export const setStats = stats => dispatch => {
   }
 };
 
-// Add users to your list of people
-// export const joinedRoom = user => dispatch => {
-//   const u = { [user]: {} };
-//   console.log(u);
-//   try {
-//     dispatch({
-//       type: JOIN_ROOM,
-//       payload: [...store.getState().room.users, u],
-//     });
-//   } catch (err) {
-//     dispatch({
-//       type: ROOM_ERROR,
-//       payload: err,
-//     });
-//   }
-// };
-
 // Set Room ID
 export const setRoom = id => dispatch => {
   try {
@@ -145,6 +128,21 @@ export const setRoomScramble = scramble => dispatch => {
     dispatch({
       type: SET_SCRAMBLE,
       payload: scramble,
+    });
+  } catch (err) {
+    dispatch({
+      type: ROOM_ERROR,
+      payload: err,
+    });
+  }
+};
+
+// Set Room Desc
+export const setRoomDesc = desc => dispatch => {
+  try {
+    dispatch({
+      type: SET_DESC,
+      payload: desc,
     });
   } catch (err) {
     dispatch({

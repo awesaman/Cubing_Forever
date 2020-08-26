@@ -7,6 +7,7 @@ import {
   RECEIVE_MESSAGE,
   SET_EVENT,
   SET_SCRAMBLE,
+  SET_DESC,
   SET_HOST,
   SET_STATS,
 } from '../actions/types';
@@ -14,12 +15,13 @@ import {
 const initialState = {
   roomID: '',
   isHost: false,
+  hostPresent: true,
+  locked: false,
   stats: [],
   chats: [],
-  speedrange: 'sub-30',
+  desc: '',
   scramble: '',
   event: '',
-  hostPresent: true,
 };
 
 export default function (state = initialState, action) {
@@ -29,7 +31,9 @@ export default function (state = initialState, action) {
     case CREATE_ROOM:
       return {
         ...state,
-        roomID: payload,
+        roomID: payload.id,
+        desc: payload.desc,
+        locked: payload.locked,
         isHost: true,
         hostPresent: true,
       };
@@ -49,6 +53,11 @@ export default function (state = initialState, action) {
         ...state,
         isHost: payload,
         hostPresent: payload,
+      };
+    case SET_DESC:
+      return {
+        ...state,
+        desc: payload,
       };
     case SET_ROOM:
       return {

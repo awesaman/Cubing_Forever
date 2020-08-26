@@ -207,6 +207,10 @@ button {
   margin-bottom: 1em;
 }
 
+input[pattern]:invalid {
+  color: red;
+}
+
 .social-input {
   display: flex;
 }
@@ -345,6 +349,13 @@ button {
 
 .mbottom {
   margin-bottom: 2em;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .inline {
@@ -526,6 +537,20 @@ button {
   overflow: wrap;
 }
 
+.input-button {
+  display: inline-block;
+  width: stretch;
+  padding: 0.4em;
+  font-size: 1.2em;
+  border: none;
+  font-family: inherit;
+}
+
+.create-button {
+  justify-content: flex-end;
+  display: inline-block;
+}
+
 .mobile,
 .reveal {
   display: none;
@@ -615,10 +640,6 @@ button {
     font-size: 0.8em;
   }
 
-  .profile-buttons {
-    flex-direction: column;
-  }
-
   .extras {
     font-size: 0.6em;
   }
@@ -639,5 +660,11 @@ button {
 
   .alert {
     top: 100px;
+  }
+
+  .timer-top,
+  .room,
+  .profile-buttons {
+    flex-direction: column;
   }
 }

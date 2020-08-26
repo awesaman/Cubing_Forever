@@ -171,7 +171,7 @@ const ProfileForm = ({
           type='text'
           placeholder='PB Single'
           name='single'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
           value={single}
           onChange={onChange}
         />
@@ -182,7 +182,7 @@ const ProfileForm = ({
           type='text'
           placeholder='PB Mean of 3'
           name='mo3'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
           value={mo3}
           onChange={onChange}
         />
@@ -196,7 +196,7 @@ const ProfileForm = ({
           type='text'
           placeholder='PB Average of 5'
           name='avg5'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
           value={avg5}
           onChange={onChange}
         />
@@ -207,7 +207,7 @@ const ProfileForm = ({
           type='text'
           placeholder='PB Average of 12'
           name='avg12'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
+          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
           value={avg12}
           onChange={onChange}
         />
