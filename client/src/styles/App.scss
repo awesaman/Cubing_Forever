@@ -351,6 +351,64 @@ input[pattern]:invalid {
   margin-bottom: 2em;
 }
 
+// @mixin groupvids($numvids) {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   position: relative;
+//   padding-top: 56.25%;
+//   @if $numvids == 2 {
+//     .vid1 {
+//       left: 0;
+//     }
+//     .vid2 {
+//       left: 100;
+//     }
+//   }
+//   @if $numvids == 3 {
+//     .vid1 {
+//       left: 0;
+//       width: 30%;
+//     }
+//     .vid2 {
+//       left: 100;
+//       width: 30%;
+//     }
+//     .vid3 {
+//       left: 200;
+//       width: 30%;
+//     }
+//   }
+// }
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.fullscreen {
+  position: relative;
+  padding-top: 56.25%;
+  margin: 2em 0;
+}
+.group2 {
+  // @include groupvids(2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2em 0;
+}
+
+// .group3 {
+//   @include groupvids(3);
+// }
+
+.notation {
+  width: 50%;
+  margin: 1em 1em;
+}
+
 .center {
   display: flex;
   flex-direction: column;
