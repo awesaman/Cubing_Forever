@@ -1,0 +1,43 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d228122d.chunk.css",
+    "main.js": "/static/js/main.434e052c.chunk.js",
+    "main.js.map": "/static/js/main.434e052c.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.09b85ec0.js",
+    "runtime-main.js.map": "/static/js/runtime-main.09b85ec0.js.map",
+    "static/js/2.d7435de7.chunk.js": "/static/js/2.d7435de7.chunk.js",
+    "static/js/2.d7435de7.chunk.js.map": "/static/js/2.d7435de7.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.7cb6bb5cb201d5a253eddefab229ab39.js": "/precache-manifest.7cb6bb5cb201d5a253eddefab229ab39.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.d228122d.chunk.css.map": "/static/css/main.d228122d.chunk.css.map",
+    "static/js/2.d7435de7.chunk.js.LICENSE.txt": "/static/js/2.d7435de7.chunk.js.LICENSE.txt",
+    "static/media/222.svg": "/static/media/222.0e6c1571.svg",
+    "static/media/333.svg": "/static/media/333.118dc8d1.svg",
+    "static/media/333bf.svg": "/static/media/333bf.30147783.svg",
+    "static/media/333fm.svg": "/static/media/333fm.52c104de.svg",
+    "static/media/333mbf.svg": "/static/media/333mbf.1534e5a4.svg",
+    "static/media/333oh.svg": "/static/media/333oh.52561d68.svg",
+    "static/media/444.svg": "/static/media/444.d0692659.svg",
+    "static/media/444bf.svg": "/static/media/444bf.d2175199.svg",
+    "static/media/555.svg": "/static/media/555.078c1cd6.svg",
+    "static/media/555bf.svg": "/static/media/555bf.46b76753.svg",
+    "static/media/666.svg": "/static/media/666.fe558ae7.svg",
+    "static/media/777.svg": "/static/media/777.fd027254.svg",
+    "static/media/clock.svg": "/static/media/clock.e4cee523.svg",
+    "static/media/cubenotation.png": "/static/media/cubenotation.f4f268d0.png",
+    "static/media/App.css": "/static/media/landingimage.603c7c54.jpg",
+    "static/media/logo.png": "/static/media/logo.d6b57692.png",
+    "static/media/minx.svg": "/static/media/minx.42c108a8.svg",
+    "static/media/pyram.svg": "/static/media/pyram.6f3a5359.svg",
+    "static/media/skewb.svg": "/static/media/skewb.0417e522.svg",
+    "static/media/spinner.gif": "/static/media/spinner.c8d74389.gif",
+    "static/media/sq1.svg": "/static/media/sq1.7008caea.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.09b85ec0.js",
+    "static/js/2.d7435de7.chunk.js",
+    "static/css/main.d228122d.chunk.css",
+    "static/js/main.434e052c.chunk.js"
+  ]
+}
