@@ -26,10 +26,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.get('/', function (req, res) {
-  res.send('working');
-});
-
 // Define Routes
 app.use('/api/user', require('./routes/api/user'));
 app.use('/api/auth', require('./routes/api/auth'));
@@ -124,6 +120,3 @@ io.on('connection', socket => {
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-// server.on('error', error => {
-//   throw new Error(`[Server]::ERROR:${error.message}`);
-// });
