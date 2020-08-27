@@ -15,7 +15,9 @@ app.use(
     parameterLimit: 50000,
   })
 );
+
 app.use(cors());
+
 app.use(express.json());
 
 // Set Static Folder in Production Build
