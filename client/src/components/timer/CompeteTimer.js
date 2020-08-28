@@ -1,6 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
 import moment from 'moment';
@@ -28,6 +27,7 @@ import Chat from './Chat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { socket } from '../../utils/socket';
+const eventNaming = require('../../utils/eventNaming.json');
 
 const CompeteTimer = ({
   getSession,

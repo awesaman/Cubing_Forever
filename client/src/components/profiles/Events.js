@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import eventNaming from '../../utils/eventNaming.json';
 import PropTypes from 'prop-types';
+const eventNaming = require('../../utils/eventNaming.json');
 
 const Events = ({ events }) => {
   return (
@@ -8,13 +8,11 @@ const Events = ({ events }) => {
       {events.map(event => (
         <div key={event._id} className='event-display'>
           <div className='event-main'>
-            {eventNaming && (
-              <img
-                src={require(`../../img/events/${eventNaming[event.name]}.svg`)}
-                alt={event.name}
-                className='event-img'
-              />
-            )}
+            <img
+              src={require(`../../img/events/${eventNaming[event.name]}.svg`)}
+              alt={event.name}
+              className='event-img'
+            />
             <p className='S'>{event.name}</p>
           </div>
           <div>

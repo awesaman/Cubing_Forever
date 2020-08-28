@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createProfile, getCurrentProfile } from '../../actions/profile';
-import eventNaming from '../../utils/eventNaming.json';
+const eventNaming = require('../../utils/eventNaming.json');
 
 const initialState = {
   bio: '',

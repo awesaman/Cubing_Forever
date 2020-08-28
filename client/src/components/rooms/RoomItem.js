@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import eventNaming from '../../utils/eventNaming.json';
+const eventNaming = require('../../utils/eventNaming.json');
 
 const RoomItem = ({ room }) => {
   let info = room[Object.keys(room)[0]];
