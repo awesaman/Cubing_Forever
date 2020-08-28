@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
-import eventNaming from '../../utils/eventNaming.json';
 import {
   getSession,
   newSession,
@@ -14,6 +13,7 @@ import {
 import { getCurrentProfile } from '../../actions/profile';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+const eventNaming = require('../../utils/eventNaming.json');
 
 const Timer = ({
   getSession,
@@ -222,13 +222,11 @@ const Timer = ({
       <div className='timer'>
         <div className='timer-top'>
           <div>
-            {eventNaming && (
-              <img
-                src={require(`../../img/events/${eventNaming[event]}.svg`)}
-                alt={event.name}
-                className='small-image'
-              />
-            )}
+            <img
+              src={require(`../../img/events/${eventNaming[event]}.svg`)}
+              alt={event.name}
+              className='small-image'
+            />
           </div>
           <select
             className='event-picker'
