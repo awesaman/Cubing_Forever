@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import eventNaming from '../../utils/eventNaming.json';
 import { Scrambow } from '../../../node_modules/scrambow/dist/scrambow';
 import useSpace from '../../utils/useKey';
+import eventNaming from '../../utils/eventNaming.json';
 import {
   getSession,
   newSession,
