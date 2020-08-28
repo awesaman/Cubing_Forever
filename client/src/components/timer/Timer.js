@@ -15,6 +15,8 @@ import { getCurrentProfile } from '../../actions/profile';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+console.log(eventNaming);
+
 const Timer = ({
   getSession,
   newSession,
