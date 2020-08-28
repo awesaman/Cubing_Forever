@@ -8,11 +8,13 @@ const Events = ({ events }) => {
       {events.map(event => (
         <div key={event._id} className='event-display'>
           <div className='event-main'>
-            <img
-              src={require(`../../img/events/${eventNaming[event.name]}.svg`)}
-              alt={event.name}
-              className='event-img'
-            />
+            {eventNaming && (
+              <img
+                src={require(`../../img/events/${eventNaming[event.name]}.svg`)}
+                alt={event.name}
+                className='event-img'
+              />
+            )}
             <p className='S'>{event.name}</p>
           </div>
           <div>

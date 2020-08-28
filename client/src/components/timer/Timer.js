@@ -15,8 +15,6 @@ import { getCurrentProfile } from '../../actions/profile';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-console.log(eventNaming);
-
 const Timer = ({
   getSession,
   newSession,
@@ -224,11 +222,13 @@ const Timer = ({
       <div className='timer'>
         <div className='timer-top'>
           <div>
-            <img
-              src={require(`../../img/events/${eventNaming[event]}.svg`)}
-              alt={event.name}
-              className='small-image'
-            />
+            {eventNaming && (
+              <img
+                src={require(`../../img/events/${eventNaming[event]}.svg`)}
+                alt={event.name}
+                className='small-image'
+              />
+            )}
           </div>
           <select
             className='event-picker'
