@@ -171,32 +171,34 @@ const ProfileForm = ({
           type='text'
           placeholder='PB Single'
           name='single'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
+          pattern='\d{0,2}:?[0-5]?[0-9]?:?[0-5]?[0-9]?\.\d{2}'
           value={single}
           onChange={onChange}
         />
         <small>Desired Format: HH:MM:SS.XX</small>
       </div>
-      <div className='form-group'>
-        <input
-          type='text'
-          placeholder='PB Mean of 3'
-          name='mo3'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
-          value={mo3}
-          onChange={onChange}
-        />
-        <small>
-          This metric is only there for those few events like 6x6 and 7x7 where
-          the mean is tracked.
-        </small>
-      </div>
+      {(name === '6x6' || name === '7x7') && (
+        <div className='form-group'>
+          <input
+            type='text'
+            placeholder='PB Mean of 3'
+            name='mo3'
+            pattern='\d{0,2}:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
+            value={mo3}
+            onChange={onChange}
+          />
+          <small>
+            This metric is only there for those few events like 6x6 and 7x7
+            where the mean is tracked.
+          </small>
+        </div>
+      )}
       <div className='form-group'>
         <input
           type='text'
           placeholder='PB Average of 5'
           name='avg5'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
+          pattern='\d{0,2}:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
           value={avg5}
           onChange={onChange}
         />
@@ -207,7 +209,7 @@ const ProfileForm = ({
           type='text'
           placeholder='PB Average of 12'
           name='avg12'
-          pattern='\d*:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
+          pattern='\d{0,2}:?[0-5]?[0-9]?:?[0-5]?[0-9]{1}\.\d{2}'
           value={avg12}
           onChange={onChange}
         />
