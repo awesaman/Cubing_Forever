@@ -119,9 +119,8 @@ io.on('connection', socket => {
   });
 });
 
-app.set('port', process.env.PORT || 5000);
-module.exports = app;
+const PORT = process.env.PORT || 5000;
 
-app.listen(app.get('port'), function () {
-  console.log('Server listening on port ' + app.get('port'));
+app.listen(PORT, () => {
+  console.log(`Server listening on port${PORT}`);
 });
