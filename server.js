@@ -35,6 +35,7 @@ app.use('/api/profile', require('./routes/api/profile'));
 // Socket Connection
 var rooms = {};
 io.on('connection', socket => {
+  console.log('user connected');
   socket.on('join room', (roomID, socketID, info) => {
     socket.join(roomID);
     socket.to(roomID).emit('user connected', socketID, info);
@@ -122,5 +123,5 @@ io.on('connection', socket => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });
