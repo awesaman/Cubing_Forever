@@ -7,21 +7,35 @@ import logo from '../../img/logo.png';
 
 const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState(null);
 
-  const onClick = () => {
+  const onLogout = () => {
     setOpen(!open);
     logout();
+  };
+
+  const onClick = curr => {
+    setOpen(!open);
+    setCurrent(curr);
   };
 
   const publicLinks = (
     <ul>
       <li>
-        <Link className='link' to='/tutorials' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'tutorials' ? 'link white' : 'link'}
+          to='/tutorials'
+          onClick={() => onClick('tutorials')}
+        >
           Tutorials
         </Link>
       </li>
       <li>
-        <Link className='link' to='/login' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'login' ? 'link white' : 'link'}
+          to='/login'
+          onClick={() => onClick('login')}
+        >
           Login
         </Link>
       </li>
@@ -31,32 +45,52 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   const privateLinks = (
     <ul>
       <li>
-        <Link className='link' to='/tutorials' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'tutorials' ? 'link white' : 'link'}
+          to='/tutorials'
+          onClick={() => onClick('tutorials')}
+        >
           Tutorials
         </Link>
       </li>
       <li>
-        <Link className='link' to='/timer' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'timer' ? 'link white' : 'link'}
+          to='/timer'
+          onClick={() => onClick('timer')}
+        >
           Timer
         </Link>
       </li>
       <li>
-        <Link className='link' to='/compete' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'compete' ? 'link white' : 'link'}
+          to='/compete'
+          onClick={() => onClick('compete')}
+        >
           Compete
         </Link>
       </li>
       <li>
-        <Link className='link' to='/profiles' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'profiles' ? 'link white' : 'link'}
+          to='/profiles'
+          onClick={() => onClick('profiles')}
+        >
           Cubers
         </Link>
       </li>
       <li>
-        <Link className='link' to='/dashboard' onClick={() => setOpen(!open)}>
+        <Link
+          className={current === 'dashboard' ? 'link white' : 'link'}
+          to='/dashboard'
+          onClick={() => onClick('dashboard')}
+        >
           Dashboard
         </Link>
       </li>
       <li>
-        <Link className='link' to='/' onClick={onClick}>
+        <Link className='link' to='/' onClick={onLogout}>
           Logout
         </Link>
       </li>
@@ -66,7 +100,7 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   return (
     <Fragment>
       <nav className='navbar'>
-        <Link className='link-logo' to='/'>
+        <Link className='link-logo' to='/' onClick={() => onClick(null)}>
           <img className='logo' src={logo} alt='Cubing Forever' />
         </Link>
         <div className='desktop'>

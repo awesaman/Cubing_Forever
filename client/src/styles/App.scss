@@ -521,6 +521,10 @@ input[pattern]:invalid {
   font-size: 0.7em;
 }
 
+.white {
+  color: $light-color;
+}
+
 .red {
   color: $danger-color;
 }

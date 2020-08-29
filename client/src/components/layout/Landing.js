@@ -1,22 +1,28 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-const Landing = () => {
+const Landing = ({ isAuthenticated }) => {
   return (
     <section className='landing'>
       <div className='landing-inner'>
         <h1 className='XL'>CUBING FOREVER</h1>
-        <p className='L subheading'>
-          Create an account to find friends and battle against them!
-        </p>
-        <div className='buttons'>
-          <Link to='/register' className='btn btn-primary'>
-            Sign Up
-          </Link>
-          <Link to='/login' className='btn btn-light'>
-            Login
-          </Link>
-        </div>
+        {!isAuthenticated && (
+          <Fragment>
+            <p className='L subheading'>
+              Create an account to find friends and battle against them!
+            </p>
+            <div className='buttons'>
+              <Link to='/register' className='btn btn-primary'>
+                Sign Up
+              </Link>
+              <Link to='/login' className='btn btn-light'>
+                Login
+              </Link>
+            </div>
+          </Fragment>
+        )}
         <br />
         <div className='extras'>
           <div>
@@ -43,4 +49,12 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+Landing.propTypes = {
+  isAuthenticated: PropTypes.bool,
+};
+
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps)(Landing);
