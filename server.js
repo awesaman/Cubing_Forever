@@ -20,12 +20,12 @@ app.use(
 app.use(cors());
 app.use(express.json());
 
-// Define Routes
+// routes
 app.use('/api/user', require('./routes/api/user'));
 app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/profile', require('./routes/api/profile'));
 
-// Set Static Folder in Production Build
+// production settings
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('./client/build'));
   app.get('*', (req, res) => {
@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Socket Connection
+// socket connection
 var rooms = {};
 io.on('connection', socket => {
   console.log('user connected');
