@@ -10,12 +10,12 @@ const Navbar = ({ auth: { isAuthenticated, loading }, logout }) => {
   const [current, setCurrent] = useState(null);
 
   const onLogout = () => {
-    setOpen(!open);
+    setOpen(false);
     logout();
   };
 
   const onClick = curr => {
-    setOpen(!open);
+    setOpen(false);
     setCurrent(curr);
   };
 

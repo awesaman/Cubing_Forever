@@ -163,7 +163,7 @@ const Timer = ({
   // handling all options available to the user
   const changeEvent = async e => {
     await setEvent(e.target.value);
-    setDisplaySolve(-1);
+    await setDisplaySolve(-1);
   };
 
   const removeSolve = async () => {
@@ -426,47 +426,50 @@ const Timer = ({
             )}
           </div>
           <div>
-            {session.solves && session.solves.length > 0 && displaySolve >= 0 && (
-              <Fragment>
-                <p className='S'>Solve Info</p>
-                <div>
-                  <p>Time: {formatTime(session.solves[displaySolve].time)}</p>
-                  {session.solves[displaySolve].penalty && (
-                    <p>Penalty: {session.solves[displaySolve].penalty}</p>
-                  )}
-                  <p>
-                    Solve: {displaySolve + 1}/{session.numsolves}
-                  </p>
-                  <p>Scramble: {session.solves[displaySolve].scramble}</p>
-                  <div className='buttons'>
-                    <button
-                      className='btn btn-danger btn-small btn-auto'
-                      onClick={removeSolve}
-                    >
-                      Delete
-                    </button>
-                    {session.solves[displaySolve].penalty !== 'DNF' && (
-                      <Fragment>
-                        {session.solves[displaySolve].penalty !== '+2' && (
+            {session.solves &&
+              session.solves.length > 0 &&
+              console.log(displaySolve) &&
+              displaySolve >= 0 && (
+                <Fragment>
+                  <p className='S'>Solve Info</p>
+                  <div>
+                    <p>Time: {formatTime(session.solves[displaySolve].time)}</p>
+                    {session.solves[displaySolve].penalty && (
+                      <p>Penalty: {session.solves[displaySolve].penalty}</p>
+                    )}
+                    <p>
+                      Solve: {displaySolve + 1}/{session.numsolves}
+                    </p>
+                    <p>Scramble: {session.solves[displaySolve].scramble}</p>
+                    <div className='buttons'>
+                      <button
+                        className='btn btn-danger btn-small btn-auto'
+                        onClick={removeSolve}
+                      >
+                        Delete
+                      </button>
+                      {session.solves[displaySolve].penalty !== 'DNF' && (
+                        <Fragment>
+                          {session.solves[displaySolve].penalty !== '+2' && (
+                            <button
+                              className='btn btn-light btn-small btn-auto'
+                              onClick={plus2}
+                            >
+                              +2
+                            </button>
+                          )}
                           <button
                             className='btn btn-light btn-small btn-auto'
-                            onClick={plus2}
+                            onClick={dnf}
                           >
-                            +2
+                            DNF
                           </button>
-                        )}
-                        <button
-                          className='btn btn-light btn-small btn-auto'
-                          onClick={dnf}
-                        >
-                          DNF
-                        </button>
-                      </Fragment>
-                    )}
+                        </Fragment>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Fragment>
-            )}
+                </Fragment>
+              )}
           </div>
         </div>
       </div>
