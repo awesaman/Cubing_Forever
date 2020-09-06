@@ -16,7 +16,6 @@ const Rooms = ({ createRoom, room }) => {
     socket.emit('request rooms');
     socket.on('send the rooms', send_rooms => {
       setRooms(send_rooms);
-      console.log(send_rooms);
     });
   }, []);
 
@@ -81,10 +80,7 @@ const Rooms = ({ createRoom, room }) => {
         <div className='rooms'>
           {rooms.length > 0 ? (
             rooms.map(room => (
-              <div>
-                {console.log(room)}
-                <RoomItem key={Object.keys(room)[0]} room={room} />
-              </div>
+              <RoomItem key={Object.keys(room)[0]} room={room} />
             ))
           ) : (
             <p>

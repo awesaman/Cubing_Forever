@@ -59,7 +59,6 @@ export const login = (email, password) => async dispatch => {
 
   try {
     const res = await api.post('/auth', body);
-    console.log(res);
     dispatch({
       type: LOGIN_SUCCESS,
       payload: res.data,
@@ -70,7 +69,6 @@ export const login = (email, password) => async dispatch => {
     dispatch(loadUser());
   } catch (err) {
     const errors = err.response.data.errors;
-    console.log(err.response.data);
     if (errors) {
       errors.forEach(error => dispatch(showAlert(error.msg, 'danger')));
     }

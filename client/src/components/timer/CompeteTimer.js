@@ -406,8 +406,6 @@ const CompeteTimer = ({
                   profile !== null &&
                   !profile.events.map(ev => ev.name).includes(room.event) && (
                     <Fragment>
-                      {console.log(profile)}
-                      {console.log(room.event)}
                       {window.alert(
                         'This event is not in your profile. Please add it to your profile and return to the room.'
                       )}
