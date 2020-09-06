@@ -236,6 +236,7 @@ const Timer = ({
             onChange={changeEvent}
           >
             {profile &&
+              profile.events &&
               profile.events.map(ev => (
                 <option key={ev._id} value={ev.name}>
                   {ev.name}
