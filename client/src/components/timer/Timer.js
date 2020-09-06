@@ -215,6 +215,10 @@ const Timer = ({
     if (status === 'ready') generateScramble();
   }, [status]);
 
+  useEffect(() => {
+    setDisplaySolve(-1);
+  }, []);
+
   useSpace('keyup', handleUp);
   useSpace('keydown', handleDown);
 
