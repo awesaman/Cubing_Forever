@@ -291,6 +291,7 @@ router.put('/stats/:event', auth, async (req, res) => {
               profile.events[e].sessions[
                 ev.sessions.length - 1
               ].bavg12 = average(s, 12);
+              profile.events[e].sessions[ev.sessions.length - 1].bavg12loc = 0;
             } else {
               if (
                 profile.events[e].sessions[ev.sessions.length - 1].cavg12 !==
@@ -330,6 +331,7 @@ router.put('/stats/:event', auth, async (req, res) => {
               profile.events[e].sessions[
                 ev.sessions.length - 1
               ].bavg50 = average(s, 50);
+              profile.events[e].sessions[ev.sessions.length - 1].bavg50loc = 0;
             } else {
               if (
                 profile.events[e].sessions[ev.sessions.length - 1].cavg50 !==
@@ -368,6 +370,7 @@ router.put('/stats/:event', auth, async (req, res) => {
               profile.events[e].sessions[
                 ev.sessions.length - 1
               ].bavg100 = average(s, 100);
+              profile.events[e].sessions[ev.sessions.length - 1].bavg100loc = 0;
             } else {
               if (
                 profile.events[e].sessions[ev.sessions.length - 1].cavg100 !==

@@ -454,7 +454,7 @@ const CompeteTimer = ({
               Leave Room
             </Link>
             {session.solves &&
-              session.solves.length > 1 &&
+              session.solves.length > 0 &&
               session.solves[session.numsolves - 1].penalty !== 'DNF' && (
                 <Fragment>
                   {session.solves[session.numsolves - 1].penalty !== '+2' && (

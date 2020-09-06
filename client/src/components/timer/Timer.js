@@ -196,6 +196,7 @@ const Timer = ({
   useEffect(() => {
     if (!profile) getCurrentProfile();
     getSession(event);
+    generateScramble(event);
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
   }, [event, loading]);
 

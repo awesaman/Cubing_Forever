@@ -177,7 +177,11 @@ const ProfileForm = ({
         />
         <small>Desired Format: HH:MM:SS.XX</small>
       </div>
-      {(name === '6x6' || name === '7x7') && (
+      {(name === '6x6' ||
+        name === '7x7' ||
+        name === '3x3 Blindfolded' ||
+        name === '4x4 Blindfolded' ||
+        name === '5x5 Blindfolded') && (
         <div className='form-group'>
           <input
             type='text'
@@ -188,8 +192,8 @@ const ProfileForm = ({
             onChange={onChange}
           />
           <small>
-            This metric is only there for those few events like 6x6 and 7x7
-            where the mean is tracked.
+            This metric is only there for those few events like 6x6, 7x7, and
+            BLD where the mean is tracked.
           </small>
         </div>
       )}
