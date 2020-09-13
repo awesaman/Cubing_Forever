@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import formatTime from '../../utils/formatTime';
 
 const useStyles = makeStyles({
   scrollable: {
@@ -33,7 +34,6 @@ const useStyles = makeStyles({
 });
 
 const Stats = ({
-  formatTime,
   bmo3,
   cmo3,
   bavg5,

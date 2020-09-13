@@ -13,6 +13,7 @@ import ProfileForm from '../profiles/ProfileForm';
 import DisplayProfile from '../profiles/DisplayProfile';
 import CompeteTimer from '../timer/CompeteTimer';
 import Rooms from '../rooms/Rooms';
+import Sessions from '../profiles/Sessions';
 
 const Routes = () => {
   return (
@@ -32,6 +33,7 @@ const Routes = () => {
           />
           <PrivateRoute exact path='/profile/:id' component={DisplayProfile} />
           <PrivateRoute exact path='/profiles' component={Profiles} />
+          <PrivateRoute exact path='/sessions' component={Sessions} />
           <PrivateRoute exact path='/dashboard' component={Dashboard} />
           <PrivateRoute exact path='/create-profile' component={ProfileForm} />
           <PrivateRoute exact path='/edit-profile' component={ProfileForm} />

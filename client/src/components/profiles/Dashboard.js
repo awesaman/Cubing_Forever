@@ -65,6 +65,9 @@ const Dashboard = ({
           {profile.events && <Events events={profile.events} />}
 
           <div className='buttons'>
+            <Link to='/sessions' className='btn btn-primary'>
+              <i className='fas fa-chart-line' /> View Statistics
+            </Link>
             <Link to='/edit-profile' className='btn btn-light'>
               <i className='fas fa-user-circle' /> Edit Profile
             </Link>
