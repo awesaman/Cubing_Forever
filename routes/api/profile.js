@@ -136,7 +136,7 @@ router.get('/solve/:event', auth, async (req, res) => {
     for (e in profile.events) {
       const ev = profile.events[e];
       if (ev.name === req.params.event) {
-        res.json(ev.sessions[ev.sessions.length - 1]);
+        res.json(ev.sessions);
         break;
       }
     }
@@ -558,6 +558,30 @@ router.delete('/solve/:event/', auth, async (req, res) => {
         profile.markModified('events'); // tells mongoose to look for changes in events array
         await profile.save(); // saves changes to mongoose
         return res.status(200).json(profile.events);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+// @route    DELETE api/profile/session/:event/:id
+// @desc     Delete a specific session
+// @access   Private
+
+router.delete('/session/:event/:id', auth, async (req, res) => {
+  try {
+    let profile = await Profile.findOne({ user: req.user.id });
+    for (e in profile.events) {
+      const ev = profile.events[e];
+      if (ev.name === req.params.event) {
+        profile.events[e].sessions = ev.sessions.filter(
+          sess => sess._id.toString() !== req.params.id
+        );
+        profile.markModified('events'); // tells mongoose to look for changes in events array
+        await profile.save(); // saves changes to mongoose
+        return res.status(200).json(profile.events[e].sessions);
       }
     }
   } catch (error) {

@@ -5,7 +5,7 @@ const formatTime = (num, penalty = null) => {
   let m = Math.floor((num - h * 60) / 60);
   let s = Math.floor(num - 3600 * h - m * 60);
   let cs = num - 3600 * h - m * 60 - s;
-  cs = Math.floor(100 * cs);
+  cs = Math.round(100 * cs);
   let result = ``;
   if (h > 0) {
     result = result.concat(h, ':');

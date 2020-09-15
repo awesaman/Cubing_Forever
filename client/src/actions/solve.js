@@ -2,10 +2,12 @@ import api from '../utils/api';
 
 import {
   GET_SOLVES,
+  GET_SESSIONS,
   CLEAR_SOLVES,
   SOLVE_ERROR,
   ADD_SOLVE,
   ADD_SESSION,
+  DELETE_SESSION,
   DELETE_SOLVE,
   UPDATE_STATS,
   ADD_PENALTY,
@@ -16,9 +18,28 @@ export const getSession = event => async dispatch => {
   try {
     let ev = event.split(' ').join('%20');
     const res = await api.get(`/profile/solve/${ev}`);
+    const sessions = res.data;
 
     dispatch({
       type: GET_SOLVES,
+      payload: sessions[sessions.length - 1],
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Get last session
+export const getAllSessions = event => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.get(`/profile/solve/${ev}`);
+
+    dispatch({
+      type: GET_SESSIONS,
       payload: res.data,
     });
   } catch (err) {
@@ -55,6 +76,24 @@ export const newSession = event => async dispatch => {
 
     dispatch({
       type: ADD_SESSION,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: SOLVE_ERROR,
+      payload: { error: err },
+    });
+  }
+};
+
+// Delete a session
+export const deleteSession = (event, id) => async dispatch => {
+  try {
+    let ev = event.split(' ').join('%20');
+    const res = await api.delete(`/profile/session/${ev}/${id}`);
+
+    dispatch({
+      type: DELETE_SESSION,
       payload: res.data,
     });
   } catch (err) {

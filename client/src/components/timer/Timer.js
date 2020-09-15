@@ -49,19 +49,19 @@ const Timer = ({
 
   // timer functions
   const run = () => {
-    if (newm === 60) {
-      newh++;
-      newm = 0;
+    newcs++;
+    if (newcs === 100) {
+      news++;
+      newcs = 0;
     }
     if (news === 60) {
       newm++;
       news = 0;
     }
-    if (newcs === 100) {
-      news++;
-      newcs = 0;
+    if (newm === 60) {
+      newh++;
+      newm = 0;
     }
-    newcs++;
     return setTime({ cs: newcs, s: news, m: newm, h: newh });
   };
 
@@ -81,7 +81,6 @@ const Timer = ({
   const reset = () => {
     setTime({ cs: 0, s: 0, m: 0, h: 0 });
     clearInterval(repeater);
-    // setPenalty('');
     newcs = news = newm = newh = 0;
   };
 
@@ -104,7 +103,6 @@ const Timer = ({
     clearInterval(repeater);
     setStatus('stopped');
     let t = 3600 * time.h + 60 * time.m + time.s + 0.01 * time.cs;
-    t = Math.floor(t * 100) / 100;
     await addSolve(event, { time: t, scramble });
     await updateStats(event);
   };

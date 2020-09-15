@@ -79,19 +79,19 @@ const CompeteTimer = ({
 
   // timer functions
   const run = () => {
-    if (newm === 60) {
-      newh++;
-      newm = 0;
+    newcs++;
+    if (newcs === 100) {
+      news++;
+      newcs = 0;
     }
     if (news === 60) {
       newm++;
       news = 0;
     }
-    if (newcs === 100) {
-      news++;
-      newcs = 0;
+    if (newm === 60) {
+      newh++;
+      newm = 0;
     }
-    newcs++;
     return setTime({ cs: newcs, s: news, m: newm, h: newh });
   };
 

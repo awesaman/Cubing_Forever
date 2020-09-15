@@ -2,16 +2,19 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { getSession } from '../../actions/solve';
+import { getSession, getAllSessions, deleteSession } from '../../actions/solve';
 import { getCurrentProfile } from '../../actions/profile';
 import formatTime from '../../utils/formatTime';
+import moment from 'moment';
 const eventNaming = require('../../utils/eventNaming.json');
 
 const Sessions = ({
   getCurrentProfile,
   getSession,
+  deleteSession,
+  getAllSessions,
   profile: { profile },
-  solve: { session, loading },
+  solve: { session, sessions, loading },
 }) => {
   const [event, setEvent] = useState('3x3');
   const [displaySolve, setDisplaySolve] = useState(-1);
@@ -21,9 +24,10 @@ const Sessions = ({
     setDisplaySolve(-1);
   };
 
-  //   useEffect(() => {
-  //     getCurrentProfile();
-  //   }, [getCurrentProfile]);
+  const onDelete = id => {
+    deleteSession(event, id);
+    // getAllSessions(event);
+  };
 
   useEffect(() => {
     if (!profile) return;
@@ -32,12 +36,12 @@ const Sessions = ({
       if (ev.name === event) hasEvent = true;
     }
     if (!hasEvent) setEvent(profile.events[0].name);
-    // getSession(event);
   }, [profile]);
 
   useEffect(() => {
     if (!profile) getCurrentProfile();
     getSession(event);
+    getAllSessions(event);
   }, [event, loading]);
 
   useEffect(() => {
@@ -213,9 +217,44 @@ const Sessions = ({
           </div>
         </div>
       </div>
+      {sessions ? (
+        <Fragment>
+          <h1 className='M'>Choose a Session to View</h1>
+          <table className='sessions'>
+            <thead>
+              <tr>
+                <th className='S'>Date</th>
+                <th className='S'># Solves</th>
+                <th className='S'>Options</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.reverse().map(sess => (
+                <tr key={sess._id}>
+                  <td>{moment(sess.date).format('MMMM Do YYYY, h:mm:ss a')}</td>
+                  <td>{sess.numsolves}</td>
+                  <td>
+                    <button className='btn btn-auto btn-small btn-primary'>
+                      View
+                    </button>
+                    <button
+                      className='btn btn-auto btn-small btn-danger'
+                      onClick={() => onDelete(sess._id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>{' '}
+        </Fragment>
+      ) : (
+        <p className='S'>There are no sessions for this event yet.</p>
+      )}
 
       <Link to='/dashboard' className='btn btn-light'>
-        Back to Dashboard
+        Go Back
       </Link>
     </Fragment>
   );
@@ -224,6 +263,8 @@ const Sessions = ({
 Sessions.propTypes = {
   getCurrentProfile: PropTypes.func.isRequired,
   getSession: PropTypes.func.isRequired,
+  deleteSession: PropTypes.func.isRequired,
+  getAllSessions: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   solve: PropTypes.object.isRequired,
 };
@@ -233,6 +274,9 @@ const mapStateToProps = state => ({
   solve: state.solve,
 });
 
-export default connect(mapStateToProps, { getCurrentProfile, getSession })(
-  Sessions
-);
+export default connect(mapStateToProps, {
+  getCurrentProfile,
+  deleteSession,
+  getSession,
+  getAllSessions,
+})(Sessions);

@@ -6,10 +6,13 @@ import {
   DELETE_SOLVE,
   UPDATE_STATS,
   ADD_PENALTY,
+  GET_SESSIONS,
+  DELETE_SESSION,
 } from '../actions/types';
 
 const initialState = {
   session: {},
+  sessions: [],
   loading: true,
 };
 
@@ -25,6 +28,12 @@ export default function (state = initialState, action) {
         ...state,
         session: payload,
         loading: false,
+      };
+    case GET_SESSIONS:
+    case DELETE_SESSION:
+      return {
+        ...state,
+        sessions: payload,
       };
     case DELETE_SOLVE:
     case CLEAR_SOLVES:
